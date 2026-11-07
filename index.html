@@ -1,2469 +1,3261 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id" class="h-full">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
     <title>Math Quest - Game Penjumlahan Super</title>
     <!-- Font Inter & Outfit -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap"
+      rel="stylesheet"
+    />
     <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-        /* Custom Styling for Canvas and Shake Effects */
-        body {
-            touch-action: manipulation;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
-            user-select: none;
-            -webkit-user-select: none;
-        }
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      /* Custom Styling for Canvas and Shake Effects */
+      body {
+        touch-action: manipulation;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background: linear-gradient(
+          135deg,
+          #0f172a 0%,
+          #1e1b4b 50%,
+          #311042 100%
+        );
+        user-select: none;
+        -webkit-user-select: none;
+      }
 
-        .font-display {
-            font-family: 'Outfit', sans-serif;
-        }
+      .font-display {
+        font-family: "Outfit", sans-serif;
+      }
 
-        /* Glassmorphism containers */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.07);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-        }
+      /* Glassmorphism containers */
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.07);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
 
-        .glass-button {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.15s ease;
-        }
+      .glass-button {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.15s ease;
+      }
 
-        .glass-button:active {
-            transform: scale(0.94);
-            background: rgba(255, 255, 255, 0.25);
-        }
+      .glass-button:active {
+        transform: scale(0.94);
+        background: rgba(255, 255, 255, 0.25);
+      }
 
-        /* Keypad press animation */
-        .numpad-btn {
-            box-shadow: 0 4px 0 rgba(0,0,0,0.3);
-        }
-        .numpad-btn:active {
-            box-shadow: 0 0 0 rgba(0,0,0,0);
-            transform: translateY(4px);
-        }
+      /* Keypad press animation */
+      .numpad-btn {
+        box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+      }
+      .numpad-btn:active {
+        box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+        transform: translateY(4px);
+      }
 
-        /* Animations */
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-12px); }
-            40%, 80% { transform: translateX(12px); }
+      /* Animations */
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
         }
-        .animate-shake {
-            animation: shake 0.4s ease-in-out;
+        20%,
+        60% {
+          transform: translateX(-12px);
         }
+        40%,
+        80% {
+          transform: translateX(12px);
+        }
+      }
+      .animate-shake {
+        animation: shake 0.4s ease-in-out;
+      }
 
-        @keyframes popSuccess {
-            0% { transform: scale(0.8); opacity: 0; }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); opacity: 1; }
+      @keyframes popSuccess {
+        0% {
+          transform: scale(0.8);
+          opacity: 0;
         }
-        .animate-pop {
-            animation: popSuccess 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        50% {
+          transform: scale(1.1);
         }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      .animate-pop {
+        animation: popSuccess 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
 
-        /* Canvas Particle Layer */
-        #particleCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: 50;
-        }
+      /* Canvas Particle Layer */
+      #particleCanvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 50;
+      }
 
-        /* Custom Scrollbar for modest usage */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 9999px;
-        }
+      /* Custom Scrollbar for modest usage */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 9999px;
+      }
     </style>
 
     <!-- Tailwind utilities compiled locally; game logic remains unchanged -->
     <style>
-/*! tailwindcss v4.1.10 | MIT License | https://tailwindcss.com */
-@layer properties;
-*, ::after, ::before, ::backdrop, ::file-selector-button {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  border: 0 solid;
-}
-html, :host {
-  line-height: 1.5;
-  -webkit-text-size-adjust: 100%;
-  tab-size: 4;
-  font-family: var(--default-font-family, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji');
-  font-feature-settings: var(--default-font-feature-settings, normal);
-  font-variation-settings: var(--default-font-variation-settings, normal);
-  -webkit-tap-highlight-color: transparent;
-}
-hr {
-  height: 0;
-  color: inherit;
-  border-top-width: 1px;
-}
-abbr:where([title]) {
-  -webkit-text-decoration: underline dotted;
-  text-decoration: underline dotted;
-}
-h1, h2, h3, h4, h5, h6 {
-  font-size: inherit;
-  font-weight: inherit;
-}
-a {
-  color: inherit;
-  -webkit-text-decoration: inherit;
-  text-decoration: inherit;
-}
-b, strong {
-  font-weight: bolder;
-}
-code, kbd, samp, pre {
-  font-family: var(--default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace);
-  font-feature-settings: var(--default-mono-font-feature-settings, normal);
-  font-variation-settings: var(--default-mono-font-variation-settings, normal);
-  font-size: 1em;
-}
-small {
-  font-size: 80%;
-}
-sub, sup {
-  font-size: 75%;
-  line-height: 0;
-  position: relative;
-  vertical-align: baseline;
-}
-sub {
-  bottom: -0.25em;
-}
-sup {
-  top: -0.5em;
-}
-table {
-  text-indent: 0;
-  border-color: inherit;
-  border-collapse: collapse;
-}
-:-moz-focusring {
-  outline: auto;
-}
-progress {
-  vertical-align: baseline;
-}
-summary {
-  display: list-item;
-}
-ol, ul, menu {
-  list-style: none;
-}
-img, svg, video, canvas, audio, iframe, embed, object {
-  display: block;
-  vertical-align: middle;
-}
-img, video {
-  max-width: 100%;
-  height: auto;
-}
-button, input, select, optgroup, textarea, ::file-selector-button {
-  font: inherit;
-  font-feature-settings: inherit;
-  font-variation-settings: inherit;
-  letter-spacing: inherit;
-  color: inherit;
-  border-radius: 0;
-  background-color: transparent;
-  opacity: 1;
-}
-:where(select:is([multiple], [size])) optgroup {
-  font-weight: bolder;
-}
-:where(select:is([multiple], [size])) optgroup option {
-  padding-inline-start: 20px;
-}
-::file-selector-button {
-  margin-inline-end: 4px;
-}
-::placeholder {
-  opacity: 1;
-}
-@supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {
-  ::placeholder {
-    color: currentcolor;
-    @supports (color: color-mix(in lab, red, red)) {
-      color: color-mix(in oklab, currentcolor 50%, transparent);
-    }
-  }
-}
-textarea {
-  resize: vertical;
-}
-::-webkit-search-decoration {
-  -webkit-appearance: none;
-}
-::-webkit-date-and-time-value {
-  min-height: 1lh;
-  text-align: inherit;
-}
-::-webkit-datetime-edit {
-  display: inline-flex;
-}
-::-webkit-datetime-edit-fields-wrapper {
-  padding: 0;
-}
-::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {
-  padding-block: 0;
-}
-:-moz-ui-invalid {
-  box-shadow: none;
-}
-button, input:where([type='button'], [type='reset'], [type='submit']), ::file-selector-button {
-  appearance: button;
-}
-::-webkit-inner-spin-button, ::-webkit-outer-spin-button {
-  height: auto;
-}
-[hidden]:where(:not([hidden='until-found'])) {
-  display: none !important;
-}
-:root, :host {
-  --font-sans: 'Plus Jakarta Sans', sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
-    monospace;
-  --color-amber-300: oklch(87.9% 0.169 91.605);
-  --color-amber-400: oklch(82.8% 0.189 84.429);
-  --color-amber-500: oklch(76.9% 0.188 70.08);
-  --color-yellow-300: oklch(90.5% 0.182 98.111);
-  --color-yellow-400: oklch(85.2% 0.199 91.936);
-  --color-emerald-400: oklch(76.5% 0.177 163.223);
-  --color-emerald-500: oklch(69.6% 0.17 162.48);
-  --color-emerald-900: oklch(37.8% 0.077 168.94);
-  --color-teal-300: oklch(85.5% 0.138 181.071);
-  --color-teal-500: oklch(70.4% 0.14 182.503);
-  --color-teal-600: oklch(60% 0.118 184.704);
-  --color-cyan-400: oklch(78.9% 0.154 211.53);
-  --color-cyan-500: oklch(71.5% 0.143 215.221);
-  --color-cyan-900: oklch(39.8% 0.07 227.392);
-  --color-blue-400: oklch(70.7% 0.165 254.624);
-  --color-blue-500: oklch(62.3% 0.214 259.815);
-  --color-blue-600: oklch(54.6% 0.245 262.881);
-  --color-indigo-400: oklch(67.3% 0.182 276.935);
-  --color-purple-400: oklch(71.4% 0.203 305.504);
-  --color-purple-500: oklch(62.7% 0.265 303.9);
-  --color-rose-300: oklch(81% 0.117 11.638);
-  --color-rose-400: oklch(71.2% 0.194 13.428);
-  --color-rose-500: oklch(64.5% 0.246 16.439);
-  --color-slate-300: oklch(86.9% 0.022 252.894);
-  --color-slate-400: oklch(70.4% 0.04 256.788);
-  --color-slate-500: oklch(55.4% 0.046 257.417);
-  --color-slate-900: oklch(20.8% 0.042 265.755);
-  --color-slate-950: oklch(12.9% 0.042 264.695);
-  --color-white: #fff;
-  --spacing: 0.25rem;
-  --container-md: 28rem;
-  --container-2xl: 42rem;
-  --text-xs: 0.75rem;
-  --text-xs--line-height: calc(1 / 0.75);
-  --text-sm: 0.875rem;
-  --text-sm--line-height: calc(1.25 / 0.875);
-  --text-base: 1rem;
-  --text-base--line-height: calc(1.5 / 1);
-  --text-lg: 1.125rem;
-  --text-lg--line-height: calc(1.75 / 1.125);
-  --text-xl: 1.25rem;
-  --text-xl--line-height: calc(1.75 / 1.25);
-  --text-2xl: 1.5rem;
-  --text-2xl--line-height: calc(2 / 1.5);
-  --text-3xl: 1.875rem;
-  --text-3xl--line-height: calc(2.25 / 1.875);
-  --text-4xl: 2.25rem;
-  --text-4xl--line-height: calc(2.5 / 2.25);
-  --text-5xl: 3rem;
-  --text-5xl--line-height: 1;
-  --text-6xl: 3.75rem;
-  --text-6xl--line-height: 1;
-  --text-7xl: 4.5rem;
-  --text-7xl--line-height: 1;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-  --font-weight-extrabold: 800;
-  --font-weight-black: 900;
-  --tracking-tight: -0.025em;
-  --tracking-wider: 0.05em;
-  --radius-xl: 0.75rem;
-  --radius-2xl: 1rem;
-  --radius-3xl: 1.5rem;
-  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-  --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  --animate-bounce: bounce 1s infinite;
-  --blur-md: 12px;
-  --default-transition-duration: 150ms;
-  --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  --default-font-family: var(--font-sans);
-  --default-mono-font-family: var(--font-mono);
-  --font-display: 'Outfit', sans-serif;
-  --animate-float: float 3s ease-in-out infinite;
-}
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
-}
-.absolute {
-  position: absolute;
-}
-.fixed {
-  position: fixed;
-}
-.relative {
-  position: relative;
-}
-.inset-0 {
-  inset: calc(var(--spacing) * 0);
-}
-.top-0 {
-  top: calc(var(--spacing) * 0);
-}
-.left-0 {
-  left: calc(var(--spacing) * 0);
-}
-.z-10 {
-  z-index: 10;
-}
-.z-50 {
-  z-index: 50;
-}
-.mx-auto {
-  margin-inline: auto;
-}
-.my-4 {
-  margin-block: calc(var(--spacing) * 4);
-}
-.my-auto {
-  margin-block: auto;
-}
-.mr-2 {
-  margin-right: calc(var(--spacing) * 2);
-}
-.mb-1 {
-  margin-bottom: calc(var(--spacing) * 1);
-}
-.mb-2 {
-  margin-bottom: calc(var(--spacing) * 2);
-}
-.mb-4 {
-  margin-bottom: calc(var(--spacing) * 4);
-}
-.mb-6 {
-  margin-bottom: calc(var(--spacing) * 6);
-}
-.ml-1 {
-  margin-left: calc(var(--spacing) * 1);
-}
-.block {
-  display: block;
-}
-.flex {
-  display: flex;
-}
-.grid {
-  display: grid;
-}
-.hidden {
-  display: none;
-}
-.inline-block {
-  display: inline-block;
-}
-.inline-flex {
-  display: inline-flex;
-}
-.h-1\.5 {
-  height: calc(var(--spacing) * 1.5);
-}
-.h-6 {
-  height: calc(var(--spacing) * 6);
-}
-.h-8 {
-  height: calc(var(--spacing) * 8);
-}
-.h-10 {
-  height: calc(var(--spacing) * 10);
-}
-.h-14 {
-  height: calc(var(--spacing) * 14);
-}
-.h-16 {
-  height: calc(var(--spacing) * 16);
-}
-.h-full {
-  height: 100%;
-}
-.w-1 {
-  width: calc(var(--spacing) * 1);
-}
-.w-1\/2 {
-  width: calc(1/2 * 100%);
-}
-.w-10 {
-  width: calc(var(--spacing) * 10);
-}
-.w-16 {
-  width: calc(var(--spacing) * 16);
-}
-.w-full {
-  width: 100%;
-}
-.max-w-2xl {
-  max-width: var(--container-2xl);
-}
-.max-w-md {
-  max-width: var(--container-md);
-}
-.min-w-\[60px\] {
-  min-width: 60px;
-}
-.min-w-\[70px\] {
-  min-width: 70px;
-}
-.flex-1 {
-  flex: 1;
-}
-.scale-95 {
-  --tw-scale-x: 95%;
-  --tw-scale-y: 95%;
-  --tw-scale-z: 95%;
-  scale: var(--tw-scale-x) var(--tw-scale-y);
-}
-.transform {
-  transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
-}
-.animate-bounce {
-  animation: var(--animate-bounce);
-}
-.animate-float {
-  animation: var(--animate-float);
-}
-.animate-pulse {
-  animation: var(--animate-pulse);
-}
-.grid-cols-1 {
-  grid-template-columns: repeat(1, minmax(0, 1fr));
-}
-.grid-cols-2 {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-.grid-cols-3 {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-.flex-col {
-  flex-direction: column;
-}
-.items-center {
-  align-items: center;
-}
-.justify-between {
-  justify-content: space-between;
-}
-.justify-center {
-  justify-content: center;
-}
-.gap-1 {
-  gap: calc(var(--spacing) * 1);
-}
-.gap-2 {
-  gap: calc(var(--spacing) * 2);
-}
-.gap-3 {
-  gap: calc(var(--spacing) * 3);
-}
-.gap-4 {
-  gap: calc(var(--spacing) * 4);
-}
-.overflow-hidden {
-  overflow: hidden;
-}
-.rounded-2xl {
-  border-radius: var(--radius-2xl);
-}
-.rounded-3xl {
-  border-radius: var(--radius-3xl);
-}
-.rounded-full {
-  border-radius: calc(infinity * 1px);
-}
-.rounded-xl {
-  border-radius: var(--radius-xl);
-}
-.border {
-  border-style: var(--tw-border-style);
-  border-width: 1px;
-}
-.border-2 {
-  border-style: var(--tw-border-style);
-  border-width: 2px;
-}
-.border-cyan-400\/50 {
-  border-color: color-mix(in srgb, oklch(78.9% 0.154 211.53) 50%, transparent);
-  @supports (color: color-mix(in lab, red, red)) {
-    border-color: color-mix(in oklab, var(--color-cyan-400) 50%, transparent);
-  }
-}
-.border-white\/10 {
-  border-color: color-mix(in srgb, #fff 10%, transparent);
-  @supports (color: color-mix(in lab, red, red)) {
-    border-color: color-mix(in oklab, var(--color-white) 10%, transparent);
-  }
-}
-.border-white\/20 {
-  border-color: color-mix(in srgb, #fff 20%, transparent);
-  @supports (color: color-mix(in lab, red, red)) {
-    border-color: color-mix(in oklab, var(--color-white) 20%, transparent);
-  }
-}
-.bg-amber-400 {
-  background-color: var(--color-amber-400);
-}
-.bg-amber-500\/20 {
-  background-color: color-mix(in srgb, oklch(76.9% 0.188 70.08) 20%, transparent);
-  @supports (color: color-mix(in lab, red, red)) {
-    background-color: color-mix(in oklab, var(--color-amber-500) 20%, transparent);
-  }
-}
-.bg-blue-500\/20 {
-  background-color: color-mix(in srgb, oklch(62.3% 0.214 259.815) 20%, transparent);
-  @supports (color: color-mix(in lab, red, red)) {
-    background-color: color-mix(in oklab, var(--color-blue-500) 20%, transparent);
-  }
-}
-.bg-blue-600\/30 {
-  background-color: color-mix(in srgb, oklch(54.6% 0.245 262.881) 30%, transparent);
-  @supports (color: color-mix(in lab, red, red)) {
-    background-color: color-mix(in oklab, var(--color-blue-600) 30%, transparent);
-  }
-}
-.bg-emerald-500\/20 {
-  background-color: color-mix(in srgb, oklch(69.6% 0.17 162.48) 20%, transparent);
-  @supports (color: color-mix(in lab, red, red)) {
-    background-color: color-mix(in oklab, var(--color-emerald-500) 20%, transparent);
-  }
-}
-.bg-purple-500\/20 {
-  background-color: color-mix(in srgb, oklch(62.7% 0.265 303.9) 20%, transparent);
-  @supports (color: color-mix(in lab, red, red)) {
-    background-color: color-mix(in oklab, var(--color-purple-500) 20%, transparent);
-  }
-}
-.bg-slate-900\/60 {
-  background-color: color-mix(in srgb, oklch(20.8% 0.042 265.755) 60%, transparent);
-  @supports (color: color-mix(in lab, red, red)) {
-    background-color: color-mix(in oklab, var(--color-slate-900) 60%, transparent);
-  }
-}
-.bg-slate-950\/80 {
-  background-color: color-mix(in srgb, oklch(12.9% 0.042 264.695) 80%, transparent);
-  @supports (color: color-mix(in lab, red, red)) {
-    background-color: color-mix(in oklab, var(--color-slate-950) 80%, transparent);
-  }
-}
-.bg-white\/5 {
-  background-color: color-mix(in srgb, #fff 5%, transparent);
-  @supports (color: color-mix(in lab, red, red)) {
-    background-color: color-mix(in oklab, var(--color-white) 5%, transparent);
-  }
-}
-.bg-gradient-to-r {
-  --tw-gradient-position: to right in oklab;
-  background-image: linear-gradient(var(--tw-gradient-stops));
-}
-.from-cyan-400 {
-  --tw-gradient-from: var(--color-cyan-400);
-  --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-}
-.from-cyan-500 {
-  --tw-gradient-from: var(--color-cyan-500);
-  --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-}
-.from-emerald-500 {
-  --tw-gradient-from: var(--color-emerald-500);
-  --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-}
-.via-teal-300 {
-  --tw-gradient-via: var(--color-teal-300);
-  --tw-gradient-via-stops: var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-via-stops);
-}
-.to-blue-400 {
-  --tw-gradient-to: var(--color-blue-400);
-  --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-}
-.to-blue-600 {
-  --tw-gradient-to: var(--color-blue-600);
-  --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-}
-.to-emerald-400 {
-  --tw-gradient-to: var(--color-emerald-400);
-  --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-}
-.to-indigo-400 {
-  --tw-gradient-to: var(--color-indigo-400);
-  --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-}
-.to-teal-600 {
-  --tw-gradient-to: var(--color-teal-600);
-  --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-}
-.bg-clip-text {
-  background-clip: text;
-}
-.p-2 {
-  padding: calc(var(--spacing) * 2);
-}
-.p-3 {
-  padding: calc(var(--spacing) * 3);
-}
-.p-4 {
-  padding: calc(var(--spacing) * 4);
-}
-.p-6 {
-  padding: calc(var(--spacing) * 6);
-}
-.px-3 {
-  padding-inline: calc(var(--spacing) * 3);
-}
-.px-4 {
-  padding-inline: calc(var(--spacing) * 4);
-}
-.py-2 {
-  padding-block: calc(var(--spacing) * 2);
-}
-.py-3 {
-  padding-block: calc(var(--spacing) * 3);
-}
-.py-3\.5 {
-  padding-block: calc(var(--spacing) * 3.5);
-}
-.py-4 {
-  padding-block: calc(var(--spacing) * 4);
-}
-.text-center {
-  text-align: center;
-}
-.text-left {
-  text-align: left;
-}
-.font-display {
-  font-family: var(--font-display);
-}
-.text-2xl {
-  font-size: var(--text-2xl);
-  line-height: var(--tw-leading, var(--text-2xl--line-height));
-}
-.text-3xl {
-  font-size: var(--text-3xl);
-  line-height: var(--tw-leading, var(--text-3xl--line-height));
-}
-.text-4xl {
-  font-size: var(--text-4xl);
-  line-height: var(--tw-leading, var(--text-4xl--line-height));
-}
-.text-lg {
-  font-size: var(--text-lg);
-  line-height: var(--tw-leading, var(--text-lg--line-height));
-}
-.text-sm {
-  font-size: var(--text-sm);
-  line-height: var(--tw-leading, var(--text-sm--line-height));
-}
-.text-xl {
-  font-size: var(--text-xl);
-  line-height: var(--tw-leading, var(--text-xl--line-height));
-}
-.text-xs {
-  font-size: var(--text-xs);
-  line-height: var(--tw-leading, var(--text-xs--line-height));
-}
-.font-black {
-  --tw-font-weight: var(--font-weight-black);
-  font-weight: var(--font-weight-black);
-}
-.font-bold {
-  --tw-font-weight: var(--font-weight-bold);
-  font-weight: var(--font-weight-bold);
-}
-.font-extrabold {
-  --tw-font-weight: var(--font-weight-extrabold);
-  font-weight: var(--font-weight-extrabold);
-}
-.font-semibold {
-  --tw-font-weight: var(--font-weight-semibold);
-  font-weight: var(--font-weight-semibold);
-}
-.tracking-tight {
-  --tw-tracking: var(--tracking-tight);
-  letter-spacing: var(--tracking-tight);
-}
-.tracking-wider {
-  --tw-tracking: var(--tracking-wider);
-  letter-spacing: var(--tracking-wider);
-}
-.text-amber-300 {
-  color: var(--color-amber-300);
-}
-.text-amber-400 {
-  color: var(--color-amber-400);
-}
-.text-amber-500 {
-  color: var(--color-amber-500);
-}
-.text-blue-400 {
-  color: var(--color-blue-400);
-}
-.text-cyan-400 {
-  color: var(--color-cyan-400);
-}
-.text-emerald-400 {
-  color: var(--color-emerald-400);
-}
-.text-purple-400 {
-  color: var(--color-purple-400);
-}
-.text-rose-400 {
-  color: var(--color-rose-400);
-}
-.text-rose-500 {
-  color: var(--color-rose-500);
-}
-.text-slate-300 {
-  color: var(--color-slate-300);
-}
-.text-slate-400 {
-  color: var(--color-slate-400);
-}
-.text-slate-500 {
-  color: var(--color-slate-500);
-}
-.text-transparent {
-  color: transparent;
-}
-.text-white {
-  color: var(--color-white);
-}
-.text-yellow-400 {
-  color: var(--color-yellow-400);
-}
-.uppercase {
-  text-transform: uppercase;
-}
-.opacity-0 {
-  opacity: 0%;
-}
-.shadow-2xl {
-  --tw-shadow: 0 25px 50px -12px var(--tw-shadow-color, rgb(0 0 0 / 0.25));
-  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
-}
-.shadow-inner {
-  --tw-shadow: inset 0 2px 4px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.05));
-  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
-}
-.shadow-lg {
-  --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
-  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
-}
-.shadow-cyan-900\/40 {
-  --tw-shadow-color: color-mix(in srgb, oklch(39.8% 0.07 227.392) 40%, transparent);
-  @supports (color: color-mix(in lab, red, red)) {
-    --tw-shadow-color: color-mix(in oklab, color-mix(in oklab, var(--color-cyan-900) 40%, transparent) var(--tw-shadow-alpha), transparent);
-  }
-}
-.shadow-emerald-900\/40 {
-  --tw-shadow-color: color-mix(in srgb, oklch(37.8% 0.077 168.94) 40%, transparent);
-  @supports (color: color-mix(in lab, red, red)) {
-    --tw-shadow-color: color-mix(in oklab, color-mix(in oklab, var(--color-emerald-900) 40%, transparent) var(--tw-shadow-alpha), transparent);
-  }
-}
-.backdrop-blur-md {
-  --tw-backdrop-blur: blur(var(--blur-md));
-  -webkit-backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
-  backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
-}
-.transition {
-  transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display, visibility, content-visibility, overlay, pointer-events;
-  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
-  transition-duration: var(--tw-duration, var(--default-transition-duration));
-}
-.transition-all {
-  transition-property: all;
-  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
-  transition-duration: var(--tw-duration, var(--default-transition-duration));
-}
-.transition-opacity {
-  transition-property: opacity;
-  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
-  transition-duration: var(--tw-duration, var(--default-transition-duration));
-}
-.transition-transform {
-  transition-property: transform, translate, scale, rotate;
-  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
-  transition-duration: var(--tw-duration, var(--default-transition-duration));
-}
-.duration-200 {
-  --tw-duration: 200ms;
-  transition-duration: 200ms;
-}
-.duration-300 {
-  --tw-duration: 300ms;
-  transition-duration: 300ms;
-}
-.duration-1000 {
-  --tw-duration: 1000ms;
-  transition-duration: 1000ms;
-}
-.ease-in-out {
-  --tw-ease: var(--ease-in-out);
-  transition-timing-function: var(--ease-in-out);
-}
-.ease-linear {
-  --tw-ease: linear;
-  transition-timing-function: linear;
-}
-.group-hover\:translate-x-1 {
-  &:is(:where(.group):hover *) {
-    @media (hover: hover) {
-      --tw-translate-x: calc(var(--spacing) * 1);
-      translate: var(--tw-translate-x) var(--tw-translate-y);
-    }
-  }
-}
-.group-hover\:scale-110 {
-  &:is(:where(.group):hover *) {
-    @media (hover: hover) {
-      --tw-scale-x: 110%;
-      --tw-scale-y: 110%;
-      --tw-scale-z: 110%;
-      scale: var(--tw-scale-x) var(--tw-scale-y);
-    }
-  }
-}
-.group-hover\:text-amber-400 {
-  &:is(:where(.group):hover *) {
-    @media (hover: hover) {
-      color: var(--color-amber-400);
-    }
-  }
-}
-.group-hover\:text-blue-400 {
-  &:is(:where(.group):hover *) {
-    @media (hover: hover) {
-      color: var(--color-blue-400);
-    }
-  }
-}
-.group-hover\:text-emerald-400 {
-  &:is(:where(.group):hover *) {
-    @media (hover: hover) {
-      color: var(--color-emerald-400);
-    }
-  }
-}
-.group-hover\:text-purple-400 {
-  &:is(:where(.group):hover *) {
-    @media (hover: hover) {
-      color: var(--color-purple-400);
-    }
-  }
-}
-.hover\:border-amber-500\/50 {
-  &:hover {
-    @media (hover: hover) {
-      border-color: color-mix(in srgb, oklch(76.9% 0.188 70.08) 50%, transparent);
-      @supports (color: color-mix(in lab, red, red)) {
-        border-color: color-mix(in oklab, var(--color-amber-500) 50%, transparent);
+      /*! tailwindcss v4.1.10 | MIT License | https://tailwindcss.com */
+      @layer properties;
+      *,
+      ::after,
+      ::before,
+      ::backdrop,
+      ::file-selector-button {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        border: 0 solid;
       }
-    }
-  }
-}
-.hover\:border-blue-500\/50 {
-  &:hover {
-    @media (hover: hover) {
-      border-color: color-mix(in srgb, oklch(62.3% 0.214 259.815) 50%, transparent);
-      @supports (color: color-mix(in lab, red, red)) {
-        border-color: color-mix(in oklab, var(--color-blue-500) 50%, transparent);
+      html,
+      :host {
+        line-height: 1.5;
+        -webkit-text-size-adjust: 100%;
+        tab-size: 4;
+        font-family: var(
+          --default-font-family,
+          ui-sans-serif,
+          system-ui,
+          sans-serif,
+          "Apple Color Emoji",
+          "Segoe UI Emoji",
+          "Segoe UI Symbol",
+          "Noto Color Emoji"
+        );
+        font-feature-settings: var(--default-font-feature-settings, normal);
+        font-variation-settings: var(--default-font-variation-settings, normal);
+        -webkit-tap-highlight-color: transparent;
       }
-    }
-  }
-}
-.hover\:border-emerald-500\/50 {
-  &:hover {
-    @media (hover: hover) {
-      border-color: color-mix(in srgb, oklch(69.6% 0.17 162.48) 50%, transparent);
-      @supports (color: color-mix(in lab, red, red)) {
-        border-color: color-mix(in oklab, var(--color-emerald-500) 50%, transparent);
+      hr {
+        height: 0;
+        color: inherit;
+        border-top-width: 1px;
       }
-    }
-  }
-}
-.hover\:border-purple-500\/50 {
-  &:hover {
-    @media (hover: hover) {
-      border-color: color-mix(in srgb, oklch(62.7% 0.265 303.9) 50%, transparent);
-      @supports (color: color-mix(in lab, red, red)) {
-        border-color: color-mix(in oklab, var(--color-purple-500) 50%, transparent);
+      abbr:where([title]) {
+        -webkit-text-decoration: underline dotted;
+        text-decoration: underline dotted;
       }
-    }
-  }
-}
-.hover\:bg-amber-500\/20 {
-  &:hover {
-    @media (hover: hover) {
-      background-color: color-mix(in srgb, oklch(76.9% 0.188 70.08) 20%, transparent);
-      @supports (color: color-mix(in lab, red, red)) {
-        background-color: color-mix(in oklab, var(--color-amber-500) 20%, transparent);
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-size: inherit;
+        font-weight: inherit;
       }
-    }
-  }
-}
-.hover\:bg-blue-500\/20 {
-  &:hover {
-    @media (hover: hover) {
-      background-color: color-mix(in srgb, oklch(62.3% 0.214 259.815) 20%, transparent);
-      @supports (color: color-mix(in lab, red, red)) {
-        background-color: color-mix(in oklab, var(--color-blue-500) 20%, transparent);
+      a {
+        color: inherit;
+        -webkit-text-decoration: inherit;
+        text-decoration: inherit;
       }
-    }
-  }
-}
-.hover\:bg-emerald-500\/20 {
-  &:hover {
-    @media (hover: hover) {
-      background-color: color-mix(in srgb, oklch(69.6% 0.17 162.48) 20%, transparent);
-      @supports (color: color-mix(in lab, red, red)) {
-        background-color: color-mix(in oklab, var(--color-emerald-500) 20%, transparent);
+      b,
+      strong {
+        font-weight: bolder;
       }
-    }
-  }
-}
-.hover\:bg-purple-500\/20 {
-  &:hover {
-    @media (hover: hover) {
-      background-color: color-mix(in srgb, oklch(62.7% 0.265 303.9) 20%, transparent);
-      @supports (color: color-mix(in lab, red, red)) {
-        background-color: color-mix(in oklab, var(--color-purple-500) 20%, transparent);
+      code,
+      kbd,
+      samp,
+      pre {
+        font-family: var(
+          --default-mono-font-family,
+          ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          Monaco,
+          Consolas,
+          "Liberation Mono",
+          "Courier New",
+          monospace
+        );
+        font-feature-settings: var(
+          --default-mono-font-feature-settings,
+          normal
+        );
+        font-variation-settings: var(
+          --default-mono-font-variation-settings,
+          normal
+        );
+        font-size: 1em;
       }
-    }
-  }
-}
-.hover\:bg-rose-500\/20 {
-  &:hover {
-    @media (hover: hover) {
-      background-color: color-mix(in srgb, oklch(64.5% 0.246 16.439) 20%, transparent);
-      @supports (color: color-mix(in lab, red, red)) {
-        background-color: color-mix(in oklab, var(--color-rose-500) 20%, transparent);
+      small {
+        font-size: 80%;
       }
-    }
-  }
-}
-.hover\:bg-white\/20 {
-  &:hover {
-    @media (hover: hover) {
-      background-color: color-mix(in srgb, #fff 20%, transparent);
-      @supports (color: color-mix(in lab, red, red)) {
-        background-color: color-mix(in oklab, var(--color-white) 20%, transparent);
+      sub,
+      sup {
+        font-size: 75%;
+        line-height: 0;
+        position: relative;
+        vertical-align: baseline;
       }
-    }
-  }
-}
-.hover\:from-cyan-400 {
-  &:hover {
-    @media (hover: hover) {
-      --tw-gradient-from: var(--color-cyan-400);
-      --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-    }
-  }
-}
-.hover\:from-emerald-400 {
-  &:hover {
-    @media (hover: hover) {
-      --tw-gradient-from: var(--color-emerald-400);
-      --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-    }
-  }
-}
-.hover\:to-blue-500 {
-  &:hover {
-    @media (hover: hover) {
-      --tw-gradient-to: var(--color-blue-500);
-      --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-    }
-  }
-}
-.hover\:to-teal-500 {
-  &:hover {
-    @media (hover: hover) {
-      --tw-gradient-to: var(--color-teal-500);
-      --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-    }
-  }
-}
-.hover\:text-rose-300 {
-  &:hover {
-    @media (hover: hover) {
-      color: var(--color-rose-300);
-    }
-  }
-}
-.hover\:text-yellow-300 {
-  &:hover {
-    @media (hover: hover) {
-      color: var(--color-yellow-300);
-    }
-  }
-}
-.focus\:outline-none {
-  &:focus {
-    --tw-outline-style: none;
-    outline-style: none;
-  }
-}
-.sm\:h-16 {
-  @media (width >= 40rem) {
-    height: calc(var(--spacing) * 16);
-  }
-}
-.sm\:h-20 {
-  @media (width >= 40rem) {
-    height: calc(var(--spacing) * 20);
-  }
-}
-.sm\:min-w-\[120px\] {
-  @media (width >= 40rem) {
-    min-width: 120px;
-  }
-}
-.sm\:gap-3 {
-  @media (width >= 40rem) {
-    gap: calc(var(--spacing) * 3);
-  }
-}
-.sm\:gap-4 {
-  @media (width >= 40rem) {
-    gap: calc(var(--spacing) * 4);
-  }
-}
-.sm\:gap-6 {
-  @media (width >= 40rem) {
-    gap: calc(var(--spacing) * 6);
-  }
-}
-.sm\:gap-8 {
-  @media (width >= 40rem) {
-    gap: calc(var(--spacing) * 8);
-  }
-}
-.sm\:p-3 {
-  @media (width >= 40rem) {
-    padding: calc(var(--spacing) * 3);
-  }
-}
-.sm\:p-6 {
-  @media (width >= 40rem) {
-    padding: calc(var(--spacing) * 6);
-  }
-}
-.sm\:p-8 {
-  @media (width >= 40rem) {
-    padding: calc(var(--spacing) * 8);
-  }
-}
-.sm\:px-4 {
-  @media (width >= 40rem) {
-    padding-inline: calc(var(--spacing) * 4);
-  }
-}
-.sm\:px-6 {
-  @media (width >= 40rem) {
-    padding-inline: calc(var(--spacing) * 6);
-  }
-}
-.sm\:py-4 {
-  @media (width >= 40rem) {
-    padding-block: calc(var(--spacing) * 4);
-  }
-}
-.sm\:text-3xl {
-  @media (width >= 40rem) {
-    font-size: var(--text-3xl);
-    line-height: var(--tw-leading, var(--text-3xl--line-height));
-  }
-}
-.sm\:text-5xl {
-  @media (width >= 40rem) {
-    font-size: var(--text-5xl);
-    line-height: var(--tw-leading, var(--text-5xl--line-height));
-  }
-}
-.sm\:text-6xl {
-  @media (width >= 40rem) {
-    font-size: var(--text-6xl);
-    line-height: var(--tw-leading, var(--text-6xl--line-height));
-  }
-}
-.sm\:text-7xl {
-  @media (width >= 40rem) {
-    font-size: var(--text-7xl);
-    line-height: var(--tw-leading, var(--text-7xl--line-height));
-  }
-}
-.sm\:text-base {
-  @media (width >= 40rem) {
-    font-size: var(--text-base);
-    line-height: var(--tw-leading, var(--text-base--line-height));
-  }
-}
-.sm\:text-sm {
-  @media (width >= 40rem) {
-    font-size: var(--text-sm);
-    line-height: var(--tw-leading, var(--text-sm--line-height));
-  }
-}
-.sm\:text-xl {
-  @media (width >= 40rem) {
-    font-size: var(--text-xl);
-    line-height: var(--tw-leading, var(--text-xl--line-height));
-  }
-}
-@property --tw-scale-x {
-  syntax: "*";
-  inherits: false;
-  initial-value: 1;
-}
-@property --tw-scale-y {
-  syntax: "*";
-  inherits: false;
-  initial-value: 1;
-}
-@property --tw-scale-z {
-  syntax: "*";
-  inherits: false;
-  initial-value: 1;
-}
-@property --tw-rotate-x {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-rotate-y {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-rotate-z {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-skew-x {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-skew-y {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-border-style {
-  syntax: "*";
-  inherits: false;
-  initial-value: solid;
-}
-@property --tw-gradient-position {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-gradient-from {
-  syntax: "<color>";
-  inherits: false;
-  initial-value: #0000;
-}
-@property --tw-gradient-via {
-  syntax: "<color>";
-  inherits: false;
-  initial-value: #0000;
-}
-@property --tw-gradient-to {
-  syntax: "<color>";
-  inherits: false;
-  initial-value: #0000;
-}
-@property --tw-gradient-stops {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-gradient-via-stops {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-gradient-from-position {
-  syntax: "<length-percentage>";
-  inherits: false;
-  initial-value: 0%;
-}
-@property --tw-gradient-via-position {
-  syntax: "<length-percentage>";
-  inherits: false;
-  initial-value: 50%;
-}
-@property --tw-gradient-to-position {
-  syntax: "<length-percentage>";
-  inherits: false;
-  initial-value: 100%;
-}
-@property --tw-font-weight {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-tracking {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-shadow {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0 0 #0000;
-}
-@property --tw-shadow-color {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-shadow-alpha {
-  syntax: "<percentage>";
-  inherits: false;
-  initial-value: 100%;
-}
-@property --tw-inset-shadow {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0 0 #0000;
-}
-@property --tw-inset-shadow-color {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-inset-shadow-alpha {
-  syntax: "<percentage>";
-  inherits: false;
-  initial-value: 100%;
-}
-@property --tw-ring-color {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-ring-shadow {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0 0 #0000;
-}
-@property --tw-inset-ring-color {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-inset-ring-shadow {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0 0 #0000;
-}
-@property --tw-ring-inset {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-ring-offset-width {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-@property --tw-ring-offset-color {
-  syntax: "*";
-  inherits: false;
-  initial-value: #fff;
-}
-@property --tw-ring-offset-shadow {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0 0 #0000;
-}
-@property --tw-backdrop-blur {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-backdrop-brightness {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-backdrop-contrast {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-backdrop-grayscale {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-backdrop-hue-rotate {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-backdrop-invert {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-backdrop-opacity {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-backdrop-saturate {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-backdrop-sepia {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-duration {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-ease {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-translate-x {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0;
-}
-@property --tw-translate-y {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0;
-}
-@property --tw-translate-z {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0;
-}
-@keyframes pulse {
-  50% {
-    opacity: 0.5;
-  }
-}
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(-25%);
-    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
-  }
-  50% {
-    transform: none;
-    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-  }
-}
-@layer properties {
-  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
-    *, ::before, ::after, ::backdrop {
-      --tw-scale-x: 1;
-      --tw-scale-y: 1;
-      --tw-scale-z: 1;
-      --tw-rotate-x: initial;
-      --tw-rotate-y: initial;
-      --tw-rotate-z: initial;
-      --tw-skew-x: initial;
-      --tw-skew-y: initial;
-      --tw-border-style: solid;
-      --tw-gradient-position: initial;
-      --tw-gradient-from: #0000;
-      --tw-gradient-via: #0000;
-      --tw-gradient-to: #0000;
-      --tw-gradient-stops: initial;
-      --tw-gradient-via-stops: initial;
-      --tw-gradient-from-position: 0%;
-      --tw-gradient-via-position: 50%;
-      --tw-gradient-to-position: 100%;
-      --tw-font-weight: initial;
-      --tw-tracking: initial;
-      --tw-shadow: 0 0 #0000;
-      --tw-shadow-color: initial;
-      --tw-shadow-alpha: 100%;
-      --tw-inset-shadow: 0 0 #0000;
-      --tw-inset-shadow-color: initial;
-      --tw-inset-shadow-alpha: 100%;
-      --tw-ring-color: initial;
-      --tw-ring-shadow: 0 0 #0000;
-      --tw-inset-ring-color: initial;
-      --tw-inset-ring-shadow: 0 0 #0000;
-      --tw-ring-inset: initial;
-      --tw-ring-offset-width: 0px;
-      --tw-ring-offset-color: #fff;
-      --tw-ring-offset-shadow: 0 0 #0000;
-      --tw-backdrop-blur: initial;
-      --tw-backdrop-brightness: initial;
-      --tw-backdrop-contrast: initial;
-      --tw-backdrop-grayscale: initial;
-      --tw-backdrop-hue-rotate: initial;
-      --tw-backdrop-invert: initial;
-      --tw-backdrop-opacity: initial;
-      --tw-backdrop-saturate: initial;
-      --tw-backdrop-sepia: initial;
-      --tw-duration: initial;
-      --tw-ease: initial;
-      --tw-translate-x: 0;
-      --tw-translate-y: 0;
-      --tw-translate-z: 0;
-    }
-  }
-}
-
+      sub {
+        bottom: -0.25em;
+      }
+      sup {
+        top: -0.5em;
+      }
+      table {
+        text-indent: 0;
+        border-color: inherit;
+        border-collapse: collapse;
+      }
+      :-moz-focusring {
+        outline: auto;
+      }
+      progress {
+        vertical-align: baseline;
+      }
+      summary {
+        display: list-item;
+      }
+      ol,
+      ul,
+      menu {
+        list-style: none;
+      }
+      img,
+      svg,
+      video,
+      canvas,
+      audio,
+      iframe,
+      embed,
+      object {
+        display: block;
+        vertical-align: middle;
+      }
+      img,
+      video {
+        max-width: 100%;
+        height: auto;
+      }
+      button,
+      input,
+      select,
+      optgroup,
+      textarea,
+      ::file-selector-button {
+        font: inherit;
+        font-feature-settings: inherit;
+        font-variation-settings: inherit;
+        letter-spacing: inherit;
+        color: inherit;
+        border-radius: 0;
+        background-color: transparent;
+        opacity: 1;
+      }
+      :where(select:is([multiple], [size])) optgroup {
+        font-weight: bolder;
+      }
+      :where(select:is([multiple], [size])) optgroup option {
+        padding-inline-start: 20px;
+      }
+      ::file-selector-button {
+        margin-inline-end: 4px;
+      }
+      ::placeholder {
+        opacity: 1;
+      }
+      @supports (not (-webkit-appearance: -apple-pay-button)) or
+        (contain-intrinsic-size: 1px) {
+        ::placeholder {
+          color: currentcolor;
+          @supports (color: color-mix(in lab, red, red)) {
+            color: color-mix(in oklab, currentcolor 50%, transparent);
+          }
+        }
+      }
+      textarea {
+        resize: vertical;
+      }
+      ::-webkit-search-decoration {
+        -webkit-appearance: none;
+      }
+      ::-webkit-date-and-time-value {
+        min-height: 1lh;
+        text-align: inherit;
+      }
+      ::-webkit-datetime-edit {
+        display: inline-flex;
+      }
+      ::-webkit-datetime-edit-fields-wrapper {
+        padding: 0;
+      }
+      ::-webkit-datetime-edit,
+      ::-webkit-datetime-edit-year-field,
+      ::-webkit-datetime-edit-month-field,
+      ::-webkit-datetime-edit-day-field,
+      ::-webkit-datetime-edit-hour-field,
+      ::-webkit-datetime-edit-minute-field,
+      ::-webkit-datetime-edit-second-field,
+      ::-webkit-datetime-edit-millisecond-field,
+      ::-webkit-datetime-edit-meridiem-field {
+        padding-block: 0;
+      }
+      :-moz-ui-invalid {
+        box-shadow: none;
+      }
+      button,
+      input:where([type="button"], [type="reset"], [type="submit"]),
+      ::file-selector-button {
+        appearance: button;
+      }
+      ::-webkit-inner-spin-button,
+      ::-webkit-outer-spin-button {
+        height: auto;
+      }
+      [hidden]:where(:not([hidden="until-found"])) {
+        display: none !important;
+      }
+      :root,
+      :host {
+        --font-sans: "Plus Jakarta Sans", sans-serif;
+        --font-mono:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        --color-amber-300: oklch(87.9% 0.169 91.605);
+        --color-amber-400: oklch(82.8% 0.189 84.429);
+        --color-amber-500: oklch(76.9% 0.188 70.08);
+        --color-yellow-300: oklch(90.5% 0.182 98.111);
+        --color-yellow-400: oklch(85.2% 0.199 91.936);
+        --color-emerald-400: oklch(76.5% 0.177 163.223);
+        --color-emerald-500: oklch(69.6% 0.17 162.48);
+        --color-emerald-900: oklch(37.8% 0.077 168.94);
+        --color-teal-300: oklch(85.5% 0.138 181.071);
+        --color-teal-500: oklch(70.4% 0.14 182.503);
+        --color-teal-600: oklch(60% 0.118 184.704);
+        --color-cyan-400: oklch(78.9% 0.154 211.53);
+        --color-cyan-500: oklch(71.5% 0.143 215.221);
+        --color-cyan-900: oklch(39.8% 0.07 227.392);
+        --color-blue-400: oklch(70.7% 0.165 254.624);
+        --color-blue-500: oklch(62.3% 0.214 259.815);
+        --color-blue-600: oklch(54.6% 0.245 262.881);
+        --color-indigo-400: oklch(67.3% 0.182 276.935);
+        --color-purple-400: oklch(71.4% 0.203 305.504);
+        --color-purple-500: oklch(62.7% 0.265 303.9);
+        --color-rose-300: oklch(81% 0.117 11.638);
+        --color-rose-400: oklch(71.2% 0.194 13.428);
+        --color-rose-500: oklch(64.5% 0.246 16.439);
+        --color-slate-300: oklch(86.9% 0.022 252.894);
+        --color-slate-400: oklch(70.4% 0.04 256.788);
+        --color-slate-500: oklch(55.4% 0.046 257.417);
+        --color-slate-900: oklch(20.8% 0.042 265.755);
+        --color-slate-950: oklch(12.9% 0.042 264.695);
+        --color-white: #fff;
+        --spacing: 0.25rem;
+        --container-md: 28rem;
+        --container-2xl: 42rem;
+        --text-xs: 0.75rem;
+        --text-xs--line-height: calc(1 / 0.75);
+        --text-sm: 0.875rem;
+        --text-sm--line-height: calc(1.25 / 0.875);
+        --text-base: 1rem;
+        --text-base--line-height: calc(1.5 / 1);
+        --text-lg: 1.125rem;
+        --text-lg--line-height: calc(1.75 / 1.125);
+        --text-xl: 1.25rem;
+        --text-xl--line-height: calc(1.75 / 1.25);
+        --text-2xl: 1.5rem;
+        --text-2xl--line-height: calc(2 / 1.5);
+        --text-3xl: 1.875rem;
+        --text-3xl--line-height: calc(2.25 / 1.875);
+        --text-4xl: 2.25rem;
+        --text-4xl--line-height: calc(2.5 / 2.25);
+        --text-5xl: 3rem;
+        --text-5xl--line-height: 1;
+        --text-6xl: 3.75rem;
+        --text-6xl--line-height: 1;
+        --text-7xl: 4.5rem;
+        --text-7xl--line-height: 1;
+        --font-weight-semibold: 600;
+        --font-weight-bold: 700;
+        --font-weight-extrabold: 800;
+        --font-weight-black: 900;
+        --tracking-tight: -0.025em;
+        --tracking-wider: 0.05em;
+        --radius-xl: 0.75rem;
+        --radius-2xl: 1rem;
+        --radius-3xl: 1.5rem;
+        --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+        --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        --animate-bounce: bounce 1s infinite;
+        --blur-md: 12px;
+        --default-transition-duration: 150ms;
+        --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        --default-font-family: var(--font-sans);
+        --default-mono-font-family: var(--font-mono);
+        --font-display: "Outfit", sans-serif;
+        --animate-float: float 3s ease-in-out infinite;
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+      .absolute {
+        position: absolute;
+      }
+      .fixed {
+        position: fixed;
+      }
+      .relative {
+        position: relative;
+      }
+      .inset-0 {
+        inset: calc(var(--spacing) * 0);
+      }
+      .top-0 {
+        top: calc(var(--spacing) * 0);
+      }
+      .left-0 {
+        left: calc(var(--spacing) * 0);
+      }
+      .z-10 {
+        z-index: 10;
+      }
+      .z-50 {
+        z-index: 50;
+      }
+      .mx-auto {
+        margin-inline: auto;
+      }
+      .my-4 {
+        margin-block: calc(var(--spacing) * 4);
+      }
+      .my-auto {
+        margin-block: auto;
+      }
+      .mr-2 {
+        margin-right: calc(var(--spacing) * 2);
+      }
+      .mb-1 {
+        margin-bottom: calc(var(--spacing) * 1);
+      }
+      .mb-2 {
+        margin-bottom: calc(var(--spacing) * 2);
+      }
+      .mb-4 {
+        margin-bottom: calc(var(--spacing) * 4);
+      }
+      .mb-6 {
+        margin-bottom: calc(var(--spacing) * 6);
+      }
+      .ml-1 {
+        margin-left: calc(var(--spacing) * 1);
+      }
+      .block {
+        display: block;
+      }
+      .flex {
+        display: flex;
+      }
+      .grid {
+        display: grid;
+      }
+      .hidden {
+        display: none;
+      }
+      .inline-block {
+        display: inline-block;
+      }
+      .inline-flex {
+        display: inline-flex;
+      }
+      .h-1\.5 {
+        height: calc(var(--spacing) * 1.5);
+      }
+      .h-6 {
+        height: calc(var(--spacing) * 6);
+      }
+      .h-8 {
+        height: calc(var(--spacing) * 8);
+      }
+      .h-10 {
+        height: calc(var(--spacing) * 10);
+      }
+      .h-14 {
+        height: calc(var(--spacing) * 14);
+      }
+      .h-16 {
+        height: calc(var(--spacing) * 16);
+      }
+      .h-full {
+        height: 100%;
+      }
+      .w-1 {
+        width: calc(var(--spacing) * 1);
+      }
+      .w-1\/2 {
+        width: calc(1 / 2 * 100%);
+      }
+      .w-10 {
+        width: calc(var(--spacing) * 10);
+      }
+      .w-16 {
+        width: calc(var(--spacing) * 16);
+      }
+      .w-full {
+        width: 100%;
+      }
+      .max-w-2xl {
+        max-width: var(--container-2xl);
+      }
+      .max-w-md {
+        max-width: var(--container-md);
+      }
+      .min-w-\[60px\] {
+        min-width: 60px;
+      }
+      .min-w-\[70px\] {
+        min-width: 70px;
+      }
+      .flex-1 {
+        flex: 1;
+      }
+      .scale-95 {
+        --tw-scale-x: 95%;
+        --tw-scale-y: 95%;
+        --tw-scale-z: 95%;
+        scale: var(--tw-scale-x) var(--tw-scale-y);
+      }
+      .transform {
+        transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,)
+          var(--tw-skew-x,) var(--tw-skew-y,);
+      }
+      .animate-bounce {
+        animation: var(--animate-bounce);
+      }
+      .animate-float {
+        animation: var(--animate-float);
+      }
+      .animate-pulse {
+        animation: var(--animate-pulse);
+      }
+      .grid-cols-1 {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+      }
+      .grid-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .grid-cols-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .flex-col {
+        flex-direction: column;
+      }
+      .items-center {
+        align-items: center;
+      }
+      .justify-between {
+        justify-content: space-between;
+      }
+      .justify-center {
+        justify-content: center;
+      }
+      .gap-1 {
+        gap: calc(var(--spacing) * 1);
+      }
+      .gap-2 {
+        gap: calc(var(--spacing) * 2);
+      }
+      .gap-3 {
+        gap: calc(var(--spacing) * 3);
+      }
+      .gap-4 {
+        gap: calc(var(--spacing) * 4);
+      }
+      .overflow-hidden {
+        overflow: hidden;
+      }
+      .rounded-2xl {
+        border-radius: var(--radius-2xl);
+      }
+      .rounded-3xl {
+        border-radius: var(--radius-3xl);
+      }
+      .rounded-full {
+        border-radius: calc(infinity * 1px);
+      }
+      .rounded-xl {
+        border-radius: var(--radius-xl);
+      }
+      .border {
+        border-style: var(--tw-border-style);
+        border-width: 1px;
+      }
+      .border-2 {
+        border-style: var(--tw-border-style);
+        border-width: 2px;
+      }
+      .border-cyan-400\/50 {
+        border-color: color-mix(
+          in srgb,
+          oklch(78.9% 0.154 211.53) 50%,
+          transparent
+        );
+        @supports (color: color-mix(in lab, red, red)) {
+          border-color: color-mix(
+            in oklab,
+            var(--color-cyan-400) 50%,
+            transparent
+          );
+        }
+      }
+      .border-white\/10 {
+        border-color: color-mix(in srgb, #fff 10%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          border-color: color-mix(
+            in oklab,
+            var(--color-white) 10%,
+            transparent
+          );
+        }
+      }
+      .border-white\/20 {
+        border-color: color-mix(in srgb, #fff 20%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          border-color: color-mix(
+            in oklab,
+            var(--color-white) 20%,
+            transparent
+          );
+        }
+      }
+      .bg-amber-400 {
+        background-color: var(--color-amber-400);
+      }
+      .bg-amber-500\/20 {
+        background-color: color-mix(
+          in srgb,
+          oklch(76.9% 0.188 70.08) 20%,
+          transparent
+        );
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(
+            in oklab,
+            var(--color-amber-500) 20%,
+            transparent
+          );
+        }
+      }
+      .bg-blue-500\/20 {
+        background-color: color-mix(
+          in srgb,
+          oklch(62.3% 0.214 259.815) 20%,
+          transparent
+        );
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(
+            in oklab,
+            var(--color-blue-500) 20%,
+            transparent
+          );
+        }
+      }
+      .bg-blue-600\/30 {
+        background-color: color-mix(
+          in srgb,
+          oklch(54.6% 0.245 262.881) 30%,
+          transparent
+        );
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(
+            in oklab,
+            var(--color-blue-600) 30%,
+            transparent
+          );
+        }
+      }
+      .bg-emerald-500\/20 {
+        background-color: color-mix(
+          in srgb,
+          oklch(69.6% 0.17 162.48) 20%,
+          transparent
+        );
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(
+            in oklab,
+            var(--color-emerald-500) 20%,
+            transparent
+          );
+        }
+      }
+      .bg-purple-500\/20 {
+        background-color: color-mix(
+          in srgb,
+          oklch(62.7% 0.265 303.9) 20%,
+          transparent
+        );
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(
+            in oklab,
+            var(--color-purple-500) 20%,
+            transparent
+          );
+        }
+      }
+      .bg-slate-900\/60 {
+        background-color: color-mix(
+          in srgb,
+          oklch(20.8% 0.042 265.755) 60%,
+          transparent
+        );
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(
+            in oklab,
+            var(--color-slate-900) 60%,
+            transparent
+          );
+        }
+      }
+      .bg-slate-950\/80 {
+        background-color: color-mix(
+          in srgb,
+          oklch(12.9% 0.042 264.695) 80%,
+          transparent
+        );
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(
+            in oklab,
+            var(--color-slate-950) 80%,
+            transparent
+          );
+        }
+      }
+      .bg-white\/5 {
+        background-color: color-mix(in srgb, #fff 5%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(
+            in oklab,
+            var(--color-white) 5%,
+            transparent
+          );
+        }
+      }
+      .bg-gradient-to-r {
+        --tw-gradient-position: to right in oklab;
+        background-image: linear-gradient(var(--tw-gradient-stops));
+      }
+      .from-cyan-400 {
+        --tw-gradient-from: var(--color-cyan-400);
+        --tw-gradient-stops: var(
+          --tw-gradient-via-stops,
+          var(--tw-gradient-position),
+          var(--tw-gradient-from) var(--tw-gradient-from-position),
+          var(--tw-gradient-to) var(--tw-gradient-to-position)
+        );
+      }
+      .from-cyan-500 {
+        --tw-gradient-from: var(--color-cyan-500);
+        --tw-gradient-stops: var(
+          --tw-gradient-via-stops,
+          var(--tw-gradient-position),
+          var(--tw-gradient-from) var(--tw-gradient-from-position),
+          var(--tw-gradient-to) var(--tw-gradient-to-position)
+        );
+      }
+      .from-emerald-500 {
+        --tw-gradient-from: var(--color-emerald-500);
+        --tw-gradient-stops: var(
+          --tw-gradient-via-stops,
+          var(--tw-gradient-position),
+          var(--tw-gradient-from) var(--tw-gradient-from-position),
+          var(--tw-gradient-to) var(--tw-gradient-to-position)
+        );
+      }
+      .via-teal-300 {
+        --tw-gradient-via: var(--color-teal-300);
+        --tw-gradient-via-stops:
+          var(--tw-gradient-position),
+          var(--tw-gradient-from) var(--tw-gradient-from-position),
+          var(--tw-gradient-via) var(--tw-gradient-via-position),
+          var(--tw-gradient-to) var(--tw-gradient-to-position);
+        --tw-gradient-stops: var(--tw-gradient-via-stops);
+      }
+      .to-blue-400 {
+        --tw-gradient-to: var(--color-blue-400);
+        --tw-gradient-stops: var(
+          --tw-gradient-via-stops,
+          var(--tw-gradient-position),
+          var(--tw-gradient-from) var(--tw-gradient-from-position),
+          var(--tw-gradient-to) var(--tw-gradient-to-position)
+        );
+      }
+      .to-blue-600 {
+        --tw-gradient-to: var(--color-blue-600);
+        --tw-gradient-stops: var(
+          --tw-gradient-via-stops,
+          var(--tw-gradient-position),
+          var(--tw-gradient-from) var(--tw-gradient-from-position),
+          var(--tw-gradient-to) var(--tw-gradient-to-position)
+        );
+      }
+      .to-emerald-400 {
+        --tw-gradient-to: var(--color-emerald-400);
+        --tw-gradient-stops: var(
+          --tw-gradient-via-stops,
+          var(--tw-gradient-position),
+          var(--tw-gradient-from) var(--tw-gradient-from-position),
+          var(--tw-gradient-to) var(--tw-gradient-to-position)
+        );
+      }
+      .to-indigo-400 {
+        --tw-gradient-to: var(--color-indigo-400);
+        --tw-gradient-stops: var(
+          --tw-gradient-via-stops,
+          var(--tw-gradient-position),
+          var(--tw-gradient-from) var(--tw-gradient-from-position),
+          var(--tw-gradient-to) var(--tw-gradient-to-position)
+        );
+      }
+      .to-teal-600 {
+        --tw-gradient-to: var(--color-teal-600);
+        --tw-gradient-stops: var(
+          --tw-gradient-via-stops,
+          var(--tw-gradient-position),
+          var(--tw-gradient-from) var(--tw-gradient-from-position),
+          var(--tw-gradient-to) var(--tw-gradient-to-position)
+        );
+      }
+      .bg-clip-text {
+        background-clip: text;
+      }
+      .p-2 {
+        padding: calc(var(--spacing) * 2);
+      }
+      .p-3 {
+        padding: calc(var(--spacing) * 3);
+      }
+      .p-4 {
+        padding: calc(var(--spacing) * 4);
+      }
+      .p-6 {
+        padding: calc(var(--spacing) * 6);
+      }
+      .px-3 {
+        padding-inline: calc(var(--spacing) * 3);
+      }
+      .px-4 {
+        padding-inline: calc(var(--spacing) * 4);
+      }
+      .py-2 {
+        padding-block: calc(var(--spacing) * 2);
+      }
+      .py-3 {
+        padding-block: calc(var(--spacing) * 3);
+      }
+      .py-3\.5 {
+        padding-block: calc(var(--spacing) * 3.5);
+      }
+      .py-4 {
+        padding-block: calc(var(--spacing) * 4);
+      }
+      .text-center {
+        text-align: center;
+      }
+      .text-left {
+        text-align: left;
+      }
+      .font-display {
+        font-family: var(--font-display);
+      }
+      .text-2xl {
+        font-size: var(--text-2xl);
+        line-height: var(--tw-leading, var(--text-2xl--line-height));
+      }
+      .text-3xl {
+        font-size: var(--text-3xl);
+        line-height: var(--tw-leading, var(--text-3xl--line-height));
+      }
+      .text-4xl {
+        font-size: var(--text-4xl);
+        line-height: var(--tw-leading, var(--text-4xl--line-height));
+      }
+      .text-lg {
+        font-size: var(--text-lg);
+        line-height: var(--tw-leading, var(--text-lg--line-height));
+      }
+      .text-sm {
+        font-size: var(--text-sm);
+        line-height: var(--tw-leading, var(--text-sm--line-height));
+      }
+      .text-xl {
+        font-size: var(--text-xl);
+        line-height: var(--tw-leading, var(--text-xl--line-height));
+      }
+      .text-xs {
+        font-size: var(--text-xs);
+        line-height: var(--tw-leading, var(--text-xs--line-height));
+      }
+      .font-black {
+        --tw-font-weight: var(--font-weight-black);
+        font-weight: var(--font-weight-black);
+      }
+      .font-bold {
+        --tw-font-weight: var(--font-weight-bold);
+        font-weight: var(--font-weight-bold);
+      }
+      .font-extrabold {
+        --tw-font-weight: var(--font-weight-extrabold);
+        font-weight: var(--font-weight-extrabold);
+      }
+      .font-semibold {
+        --tw-font-weight: var(--font-weight-semibold);
+        font-weight: var(--font-weight-semibold);
+      }
+      .tracking-tight {
+        --tw-tracking: var(--tracking-tight);
+        letter-spacing: var(--tracking-tight);
+      }
+      .tracking-wider {
+        --tw-tracking: var(--tracking-wider);
+        letter-spacing: var(--tracking-wider);
+      }
+      .text-amber-300 {
+        color: var(--color-amber-300);
+      }
+      .text-amber-400 {
+        color: var(--color-amber-400);
+      }
+      .text-amber-500 {
+        color: var(--color-amber-500);
+      }
+      .text-blue-400 {
+        color: var(--color-blue-400);
+      }
+      .text-cyan-400 {
+        color: var(--color-cyan-400);
+      }
+      .text-emerald-400 {
+        color: var(--color-emerald-400);
+      }
+      .text-purple-400 {
+        color: var(--color-purple-400);
+      }
+      .text-rose-400 {
+        color: var(--color-rose-400);
+      }
+      .text-rose-500 {
+        color: var(--color-rose-500);
+      }
+      .text-slate-300 {
+        color: var(--color-slate-300);
+      }
+      .text-slate-400 {
+        color: var(--color-slate-400);
+      }
+      .text-slate-500 {
+        color: var(--color-slate-500);
+      }
+      .text-transparent {
+        color: transparent;
+      }
+      .text-white {
+        color: var(--color-white);
+      }
+      .text-yellow-400 {
+        color: var(--color-yellow-400);
+      }
+      .uppercase {
+        text-transform: uppercase;
+      }
+      .opacity-0 {
+        opacity: 0%;
+      }
+      .shadow-2xl {
+        --tw-shadow: 0 25px 50px -12px var(--tw-shadow-color, rgb(0 0 0 / 0.25));
+        box-shadow:
+          var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
+          var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+      }
+      .shadow-inner {
+        --tw-shadow: inset 0 2px 4px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.05));
+        box-shadow:
+          var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
+          var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+      }
+      .shadow-lg {
+        --tw-shadow:
+          0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)),
+          0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+        box-shadow:
+          var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
+          var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+      }
+      .shadow-cyan-900\/40 {
+        --tw-shadow-color: color-mix(
+          in srgb,
+          oklch(39.8% 0.07 227.392) 40%,
+          transparent
+        );
+        @supports (color: color-mix(in lab, red, red)) {
+          --tw-shadow-color: color-mix(
+            in oklab,
+            color-mix(in oklab, var(--color-cyan-900) 40%, transparent)
+              var(--tw-shadow-alpha),
+            transparent
+          );
+        }
+      }
+      .shadow-emerald-900\/40 {
+        --tw-shadow-color: color-mix(
+          in srgb,
+          oklch(37.8% 0.077 168.94) 40%,
+          transparent
+        );
+        @supports (color: color-mix(in lab, red, red)) {
+          --tw-shadow-color: color-mix(
+            in oklab,
+            color-mix(in oklab, var(--color-emerald-900) 40%, transparent)
+              var(--tw-shadow-alpha),
+            transparent
+          );
+        }
+      }
+      .backdrop-blur-md {
+        --tw-backdrop-blur: blur(var(--blur-md));
+        -webkit-backdrop-filter: var(--tw-backdrop-blur,)
+          var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,)
+          var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,)
+          var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,)
+          var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
+        backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,)
+          var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,)
+          var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,)
+          var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,)
+          var(--tw-backdrop-sepia,);
+      }
+      .transition {
+        transition-property:
+          color,
+          background-color,
+          border-color,
+          outline-color,
+          text-decoration-color,
+          fill,
+          stroke,
+          --tw-gradient-from,
+          --tw-gradient-via,
+          --tw-gradient-to,
+          opacity,
+          box-shadow,
+          transform,
+          translate,
+          scale,
+          rotate,
+          filter,
+          -webkit-backdrop-filter,
+          backdrop-filter,
+          display,
+          visibility,
+          content-visibility,
+          overlay,
+          pointer-events;
+        transition-timing-function: var(
+          --tw-ease,
+          var(--default-transition-timing-function)
+        );
+        transition-duration: var(
+          --tw-duration,
+          var(--default-transition-duration)
+        );
+      }
+      .transition-all {
+        transition-property: all;
+        transition-timing-function: var(
+          --tw-ease,
+          var(--default-transition-timing-function)
+        );
+        transition-duration: var(
+          --tw-duration,
+          var(--default-transition-duration)
+        );
+      }
+      .transition-opacity {
+        transition-property: opacity;
+        transition-timing-function: var(
+          --tw-ease,
+          var(--default-transition-timing-function)
+        );
+        transition-duration: var(
+          --tw-duration,
+          var(--default-transition-duration)
+        );
+      }
+      .transition-transform {
+        transition-property: transform, translate, scale, rotate;
+        transition-timing-function: var(
+          --tw-ease,
+          var(--default-transition-timing-function)
+        );
+        transition-duration: var(
+          --tw-duration,
+          var(--default-transition-duration)
+        );
+      }
+      .duration-200 {
+        --tw-duration: 200ms;
+        transition-duration: 200ms;
+      }
+      .duration-300 {
+        --tw-duration: 300ms;
+        transition-duration: 300ms;
+      }
+      .duration-1000 {
+        --tw-duration: 1000ms;
+        transition-duration: 1000ms;
+      }
+      .ease-in-out {
+        --tw-ease: var(--ease-in-out);
+        transition-timing-function: var(--ease-in-out);
+      }
+      .ease-linear {
+        --tw-ease: linear;
+        transition-timing-function: linear;
+      }
+      .group-hover\:translate-x-1 {
+        &:is(:where(.group):hover *) {
+          @media (hover: hover) {
+            --tw-translate-x: calc(var(--spacing) * 1);
+            translate: var(--tw-translate-x) var(--tw-translate-y);
+          }
+        }
+      }
+      .group-hover\:scale-110 {
+        &:is(:where(.group):hover *) {
+          @media (hover: hover) {
+            --tw-scale-x: 110%;
+            --tw-scale-y: 110%;
+            --tw-scale-z: 110%;
+            scale: var(--tw-scale-x) var(--tw-scale-y);
+          }
+        }
+      }
+      .group-hover\:text-amber-400 {
+        &:is(:where(.group):hover *) {
+          @media (hover: hover) {
+            color: var(--color-amber-400);
+          }
+        }
+      }
+      .group-hover\:text-blue-400 {
+        &:is(:where(.group):hover *) {
+          @media (hover: hover) {
+            color: var(--color-blue-400);
+          }
+        }
+      }
+      .group-hover\:text-emerald-400 {
+        &:is(:where(.group):hover *) {
+          @media (hover: hover) {
+            color: var(--color-emerald-400);
+          }
+        }
+      }
+      .group-hover\:text-purple-400 {
+        &:is(:where(.group):hover *) {
+          @media (hover: hover) {
+            color: var(--color-purple-400);
+          }
+        }
+      }
+      .hover\:border-amber-500\/50 {
+        &:hover {
+          @media (hover: hover) {
+            border-color: color-mix(
+              in srgb,
+              oklch(76.9% 0.188 70.08) 50%,
+              transparent
+            );
+            @supports (color: color-mix(in lab, red, red)) {
+              border-color: color-mix(
+                in oklab,
+                var(--color-amber-500) 50%,
+                transparent
+              );
+            }
+          }
+        }
+      }
+      .hover\:border-blue-500\/50 {
+        &:hover {
+          @media (hover: hover) {
+            border-color: color-mix(
+              in srgb,
+              oklch(62.3% 0.214 259.815) 50%,
+              transparent
+            );
+            @supports (color: color-mix(in lab, red, red)) {
+              border-color: color-mix(
+                in oklab,
+                var(--color-blue-500) 50%,
+                transparent
+              );
+            }
+          }
+        }
+      }
+      .hover\:border-emerald-500\/50 {
+        &:hover {
+          @media (hover: hover) {
+            border-color: color-mix(
+              in srgb,
+              oklch(69.6% 0.17 162.48) 50%,
+              transparent
+            );
+            @supports (color: color-mix(in lab, red, red)) {
+              border-color: color-mix(
+                in oklab,
+                var(--color-emerald-500) 50%,
+                transparent
+              );
+            }
+          }
+        }
+      }
+      .hover\:border-purple-500\/50 {
+        &:hover {
+          @media (hover: hover) {
+            border-color: color-mix(
+              in srgb,
+              oklch(62.7% 0.265 303.9) 50%,
+              transparent
+            );
+            @supports (color: color-mix(in lab, red, red)) {
+              border-color: color-mix(
+                in oklab,
+                var(--color-purple-500) 50%,
+                transparent
+              );
+            }
+          }
+        }
+      }
+      .hover\:bg-amber-500\/20 {
+        &:hover {
+          @media (hover: hover) {
+            background-color: color-mix(
+              in srgb,
+              oklch(76.9% 0.188 70.08) 20%,
+              transparent
+            );
+            @supports (color: color-mix(in lab, red, red)) {
+              background-color: color-mix(
+                in oklab,
+                var(--color-amber-500) 20%,
+                transparent
+              );
+            }
+          }
+        }
+      }
+      .hover\:bg-blue-500\/20 {
+        &:hover {
+          @media (hover: hover) {
+            background-color: color-mix(
+              in srgb,
+              oklch(62.3% 0.214 259.815) 20%,
+              transparent
+            );
+            @supports (color: color-mix(in lab, red, red)) {
+              background-color: color-mix(
+                in oklab,
+                var(--color-blue-500) 20%,
+                transparent
+              );
+            }
+          }
+        }
+      }
+      .hover\:bg-emerald-500\/20 {
+        &:hover {
+          @media (hover: hover) {
+            background-color: color-mix(
+              in srgb,
+              oklch(69.6% 0.17 162.48) 20%,
+              transparent
+            );
+            @supports (color: color-mix(in lab, red, red)) {
+              background-color: color-mix(
+                in oklab,
+                var(--color-emerald-500) 20%,
+                transparent
+              );
+            }
+          }
+        }
+      }
+      .hover\:bg-purple-500\/20 {
+        &:hover {
+          @media (hover: hover) {
+            background-color: color-mix(
+              in srgb,
+              oklch(62.7% 0.265 303.9) 20%,
+              transparent
+            );
+            @supports (color: color-mix(in lab, red, red)) {
+              background-color: color-mix(
+                in oklab,
+                var(--color-purple-500) 20%,
+                transparent
+              );
+            }
+          }
+        }
+      }
+      .hover\:bg-rose-500\/20 {
+        &:hover {
+          @media (hover: hover) {
+            background-color: color-mix(
+              in srgb,
+              oklch(64.5% 0.246 16.439) 20%,
+              transparent
+            );
+            @supports (color: color-mix(in lab, red, red)) {
+              background-color: color-mix(
+                in oklab,
+                var(--color-rose-500) 20%,
+                transparent
+              );
+            }
+          }
+        }
+      }
+      .hover\:bg-white\/20 {
+        &:hover {
+          @media (hover: hover) {
+            background-color: color-mix(in srgb, #fff 20%, transparent);
+            @supports (color: color-mix(in lab, red, red)) {
+              background-color: color-mix(
+                in oklab,
+                var(--color-white) 20%,
+                transparent
+              );
+            }
+          }
+        }
+      }
+      .hover\:from-cyan-400 {
+        &:hover {
+          @media (hover: hover) {
+            --tw-gradient-from: var(--color-cyan-400);
+            --tw-gradient-stops: var(
+              --tw-gradient-via-stops,
+              var(--tw-gradient-position),
+              var(--tw-gradient-from) var(--tw-gradient-from-position),
+              var(--tw-gradient-to) var(--tw-gradient-to-position)
+            );
+          }
+        }
+      }
+      .hover\:from-emerald-400 {
+        &:hover {
+          @media (hover: hover) {
+            --tw-gradient-from: var(--color-emerald-400);
+            --tw-gradient-stops: var(
+              --tw-gradient-via-stops,
+              var(--tw-gradient-position),
+              var(--tw-gradient-from) var(--tw-gradient-from-position),
+              var(--tw-gradient-to) var(--tw-gradient-to-position)
+            );
+          }
+        }
+      }
+      .hover\:to-blue-500 {
+        &:hover {
+          @media (hover: hover) {
+            --tw-gradient-to: var(--color-blue-500);
+            --tw-gradient-stops: var(
+              --tw-gradient-via-stops,
+              var(--tw-gradient-position),
+              var(--tw-gradient-from) var(--tw-gradient-from-position),
+              var(--tw-gradient-to) var(--tw-gradient-to-position)
+            );
+          }
+        }
+      }
+      .hover\:to-teal-500 {
+        &:hover {
+          @media (hover: hover) {
+            --tw-gradient-to: var(--color-teal-500);
+            --tw-gradient-stops: var(
+              --tw-gradient-via-stops,
+              var(--tw-gradient-position),
+              var(--tw-gradient-from) var(--tw-gradient-from-position),
+              var(--tw-gradient-to) var(--tw-gradient-to-position)
+            );
+          }
+        }
+      }
+      .hover\:text-rose-300 {
+        &:hover {
+          @media (hover: hover) {
+            color: var(--color-rose-300);
+          }
+        }
+      }
+      .hover\:text-yellow-300 {
+        &:hover {
+          @media (hover: hover) {
+            color: var(--color-yellow-300);
+          }
+        }
+      }
+      .focus\:outline-none {
+        &:focus {
+          --tw-outline-style: none;
+          outline-style: none;
+        }
+      }
+      .sm\:h-16 {
+        @media (width >= 40rem) {
+          height: calc(var(--spacing) * 16);
+        }
+      }
+      .sm\:h-20 {
+        @media (width >= 40rem) {
+          height: calc(var(--spacing) * 20);
+        }
+      }
+      .sm\:min-w-\[120px\] {
+        @media (width >= 40rem) {
+          min-width: 120px;
+        }
+      }
+      .sm\:gap-3 {
+        @media (width >= 40rem) {
+          gap: calc(var(--spacing) * 3);
+        }
+      }
+      .sm\:gap-4 {
+        @media (width >= 40rem) {
+          gap: calc(var(--spacing) * 4);
+        }
+      }
+      .sm\:gap-6 {
+        @media (width >= 40rem) {
+          gap: calc(var(--spacing) * 6);
+        }
+      }
+      .sm\:gap-8 {
+        @media (width >= 40rem) {
+          gap: calc(var(--spacing) * 8);
+        }
+      }
+      .sm\:p-3 {
+        @media (width >= 40rem) {
+          padding: calc(var(--spacing) * 3);
+        }
+      }
+      .sm\:p-6 {
+        @media (width >= 40rem) {
+          padding: calc(var(--spacing) * 6);
+        }
+      }
+      .sm\:p-8 {
+        @media (width >= 40rem) {
+          padding: calc(var(--spacing) * 8);
+        }
+      }
+      .sm\:px-4 {
+        @media (width >= 40rem) {
+          padding-inline: calc(var(--spacing) * 4);
+        }
+      }
+      .sm\:px-6 {
+        @media (width >= 40rem) {
+          padding-inline: calc(var(--spacing) * 6);
+        }
+      }
+      .sm\:py-4 {
+        @media (width >= 40rem) {
+          padding-block: calc(var(--spacing) * 4);
+        }
+      }
+      .sm\:text-3xl {
+        @media (width >= 40rem) {
+          font-size: var(--text-3xl);
+          line-height: var(--tw-leading, var(--text-3xl--line-height));
+        }
+      }
+      .sm\:text-5xl {
+        @media (width >= 40rem) {
+          font-size: var(--text-5xl);
+          line-height: var(--tw-leading, var(--text-5xl--line-height));
+        }
+      }
+      .sm\:text-6xl {
+        @media (width >= 40rem) {
+          font-size: var(--text-6xl);
+          line-height: var(--tw-leading, var(--text-6xl--line-height));
+        }
+      }
+      .sm\:text-7xl {
+        @media (width >= 40rem) {
+          font-size: var(--text-7xl);
+          line-height: var(--tw-leading, var(--text-7xl--line-height));
+        }
+      }
+      .sm\:text-base {
+        @media (width >= 40rem) {
+          font-size: var(--text-base);
+          line-height: var(--tw-leading, var(--text-base--line-height));
+        }
+      }
+      .sm\:text-sm {
+        @media (width >= 40rem) {
+          font-size: var(--text-sm);
+          line-height: var(--tw-leading, var(--text-sm--line-height));
+        }
+      }
+      .sm\:text-xl {
+        @media (width >= 40rem) {
+          font-size: var(--text-xl);
+          line-height: var(--tw-leading, var(--text-xl--line-height));
+        }
+      }
+      @property --tw-scale-x {
+        syntax: "*";
+        inherits: false;
+        initial-value: 1;
+      }
+      @property --tw-scale-y {
+        syntax: "*";
+        inherits: false;
+        initial-value: 1;
+      }
+      @property --tw-scale-z {
+        syntax: "*";
+        inherits: false;
+        initial-value: 1;
+      }
+      @property --tw-rotate-x {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-rotate-y {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-rotate-z {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-skew-x {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-skew-y {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-border-style {
+        syntax: "*";
+        inherits: false;
+        initial-value: solid;
+      }
+      @property --tw-gradient-position {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-gradient-from {
+        syntax: "<color>";
+        inherits: false;
+        initial-value: #0000;
+      }
+      @property --tw-gradient-via {
+        syntax: "<color>";
+        inherits: false;
+        initial-value: #0000;
+      }
+      @property --tw-gradient-to {
+        syntax: "<color>";
+        inherits: false;
+        initial-value: #0000;
+      }
+      @property --tw-gradient-stops {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-gradient-via-stops {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-gradient-from-position {
+        syntax: "<length-percentage>";
+        inherits: false;
+        initial-value: 0%;
+      }
+      @property --tw-gradient-via-position {
+        syntax: "<length-percentage>";
+        inherits: false;
+        initial-value: 50%;
+      }
+      @property --tw-gradient-to-position {
+        syntax: "<length-percentage>";
+        inherits: false;
+        initial-value: 100%;
+      }
+      @property --tw-font-weight {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-tracking {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-shadow {
+        syntax: "*";
+        inherits: false;
+        initial-value: 0 0 #0000;
+      }
+      @property --tw-shadow-color {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-shadow-alpha {
+        syntax: "<percentage>";
+        inherits: false;
+        initial-value: 100%;
+      }
+      @property --tw-inset-shadow {
+        syntax: "*";
+        inherits: false;
+        initial-value: 0 0 #0000;
+      }
+      @property --tw-inset-shadow-color {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-inset-shadow-alpha {
+        syntax: "<percentage>";
+        inherits: false;
+        initial-value: 100%;
+      }
+      @property --tw-ring-color {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-ring-shadow {
+        syntax: "*";
+        inherits: false;
+        initial-value: 0 0 #0000;
+      }
+      @property --tw-inset-ring-color {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-inset-ring-shadow {
+        syntax: "*";
+        inherits: false;
+        initial-value: 0 0 #0000;
+      }
+      @property --tw-ring-inset {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-ring-offset-width {
+        syntax: "<length>";
+        inherits: false;
+        initial-value: 0px;
+      }
+      @property --tw-ring-offset-color {
+        syntax: "*";
+        inherits: false;
+        initial-value: #fff;
+      }
+      @property --tw-ring-offset-shadow {
+        syntax: "*";
+        inherits: false;
+        initial-value: 0 0 #0000;
+      }
+      @property --tw-backdrop-blur {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-backdrop-brightness {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-backdrop-contrast {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-backdrop-grayscale {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-backdrop-hue-rotate {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-backdrop-invert {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-backdrop-opacity {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-backdrop-saturate {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-backdrop-sepia {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-duration {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-ease {
+        syntax: "*";
+        inherits: false;
+      }
+      @property --tw-translate-x {
+        syntax: "*";
+        inherits: false;
+        initial-value: 0;
+      }
+      @property --tw-translate-y {
+        syntax: "*";
+        inherits: false;
+        initial-value: 0;
+      }
+      @property --tw-translate-z {
+        syntax: "*";
+        inherits: false;
+        initial-value: 0;
+      }
+      @keyframes pulse {
+        50% {
+          opacity: 0.5;
+        }
+      }
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(-25%);
+          animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+        }
+        50% {
+          transform: none;
+          animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+        }
+      }
+      @layer properties {
+        @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or
+          ((-moz-orient: inline) and (not (color: rgb(from red r g b)))) {
+          *,
+          ::before,
+          ::after,
+          ::backdrop {
+            --tw-scale-x: 1;
+            --tw-scale-y: 1;
+            --tw-scale-z: 1;
+            --tw-rotate-x: initial;
+            --tw-rotate-y: initial;
+            --tw-rotate-z: initial;
+            --tw-skew-x: initial;
+            --tw-skew-y: initial;
+            --tw-border-style: solid;
+            --tw-gradient-position: initial;
+            --tw-gradient-from: #0000;
+            --tw-gradient-via: #0000;
+            --tw-gradient-to: #0000;
+            --tw-gradient-stops: initial;
+            --tw-gradient-via-stops: initial;
+            --tw-gradient-from-position: 0%;
+            --tw-gradient-via-position: 50%;
+            --tw-gradient-to-position: 100%;
+            --tw-font-weight: initial;
+            --tw-tracking: initial;
+            --tw-shadow: 0 0 #0000;
+            --tw-shadow-color: initial;
+            --tw-shadow-alpha: 100%;
+            --tw-inset-shadow: 0 0 #0000;
+            --tw-inset-shadow-color: initial;
+            --tw-inset-shadow-alpha: 100%;
+            --tw-ring-color: initial;
+            --tw-ring-shadow: 0 0 #0000;
+            --tw-inset-ring-color: initial;
+            --tw-inset-ring-shadow: 0 0 #0000;
+            --tw-ring-inset: initial;
+            --tw-ring-offset-width: 0px;
+            --tw-ring-offset-color: #fff;
+            --tw-ring-offset-shadow: 0 0 #0000;
+            --tw-backdrop-blur: initial;
+            --tw-backdrop-brightness: initial;
+            --tw-backdrop-contrast: initial;
+            --tw-backdrop-grayscale: initial;
+            --tw-backdrop-hue-rotate: initial;
+            --tw-backdrop-invert: initial;
+            --tw-backdrop-opacity: initial;
+            --tw-backdrop-saturate: initial;
+            --tw-backdrop-sepia: initial;
+            --tw-duration: initial;
+            --tw-ease: initial;
+            --tw-translate-x: 0;
+            --tw-translate-y: 0;
+            --tw-translate-z: 0;
+          }
+        }
+      }
     </style>
 
+    <style>
+      /* =====================================================
+   RESPONSIVE RISKI MATH QUEST
+   HP, tablet, laptop, dan layar landscape
+   ===================================================== */
 
-<style>
+      html {
+        min-height: 100%;
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+      }
 
-/* =========================================================
-   RESPONSIVE LAYOUT
-   Penyesuaian tampilan HP, tablet, laptop, dan layar lebar.
-   Tidak mengubah markup maupun fungsi JavaScript permainan.
-   ========================================================= */
-
-html {
-    min-height: 100%;
-    -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
-}
-
-body {
-    width: 100%;
-    min-height: 100vh;
-    min-height: 100svh;
-    height: auto;
-    overflow-x: hidden;
-    overflow-y: auto;
-    gap: clamp(12px, 2.2vh, 24px);
-    padding:
-        max(12px, env(safe-area-inset-top))
-        max(12px, env(safe-area-inset-right))
-        max(12px, env(safe-area-inset-bottom))
-        max(12px, env(safe-area-inset-left));
-}
-
-body > header,
-body > main,
-body > footer {
-    flex-shrink: 0;
-}
-
-body > header {
-    width: min(100%, 680px);
-}
-
-body > main {
-    width: min(100%, 680px);
-    min-height: 0;
-    padding-top: clamp(8px, 2vh, 20px);
-    padding-bottom: clamp(8px, 2vh, 20px);
-}
-
-#startScreen,
-#questionCard,
-#resultModal > #modalContent {
-    min-width: 0;
-}
-
-#startScreen {
-    width: 100%;
-}
-
-#gameplayScreen {
-    width: 100%;
-    max-width: 560px;
-}
-
-#questionCard {
-    width: 100%;
-}
-
-#particleCanvas {
-    width: 100%;
-    height: 100%;
-    height: 100dvh;
-}
-
-/* Sentuhan dan fokus tombol lebih nyaman pada perangkat sentuh. */
-button {
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    cursor: pointer;
-}
-
-button:focus-visible {
-    outline: 3px solid rgba(103, 232, 249, .9);
-    outline-offset: 3px;
-}
-
-/* HP kecil */
-@media (max-width: 380px) {
-    body {
-        padding: 10px;
-        gap: 12px;
-    }
-
-    body > header {
-        padding: 10px 11px;
-        gap: 8px;
-    }
-
-    body > header > .flex.items-center {
-        gap: clamp(10px, 3vw, 16px);
-        flex: 1;
-        justify-content: space-evenly;
-    }
-
-    #soundToggleBtn,
-    #homeBtn {
-        padding: 9px;
-        flex: 0 0 auto;
-    }
-
-    #scoreText,
-    #streakText,
-    #timerText {
-        font-size: clamp(17px, 5vw, 21px);
-    }
-
-    body > main {
-        padding-top: 4px;
-        padding-bottom: 4px;
-    }
-
-    #startScreen {
-        padding: 20px 15px;
-    }
-
-    #startScreen h1 {
-        font-size: clamp(29px, 9vw, 36px);
-        line-height: 1.08;
-    }
-
-    #questionCard {
-        padding: 20px 13px;
-        margin-bottom: 16px;
-    }
-
-    #questionCard .flex.justify-center.items-center {
-        gap: clamp(8px, 2.8vw, 14px);
-    }
-
-    #num1,
-    #num2 {
-        font-size: clamp(35px, 11vw, 46px);
-    }
-
-    #answerBox {
-        min-width: 58px;
-        height: 54px;
-        padding-left: 9px;
-        padding-right: 9px;
-        font-size: clamp(27px, 8vw, 34px);
-    }
-
-    #cursor {
-        height: 27px;
-    }
-
-    #gameplayScreen > .grid {
-        gap: 8px;
-    }
-
-    #gameplayScreen .numpad-btn {
-        height: 52px;
-        border-radius: 14px;
-    }
-
-    #resultModal {
-        padding: 12px;
-    }
-
-    #modalContent {
-        padding: 22px 16px;
-    }
-
-    #modalContent h2 {
-        font-size: 26px;
-    }
-
-    #modalContent .flex.gap-3 {
-        gap: 8px;
-    }
-
-    #modalContent .flex.gap-3 button {
-        padding: 11px 7px;
-        font-size: 12px;
-    }
-}
-
-/* HP umum */
-@media (min-width: 381px) and (max-width: 640px) {
-    body {
-        padding: 12px;
-        gap: 14px;
-    }
-
-    #startScreen {
-        padding: 24px 19px;
-    }
-
-    #questionCard {
-        padding: 22px 17px;
-    }
-
-    #gameplayScreen .numpad-btn {
-        min-height: 56px;
-    }
-}
-
-/* Tablet dan layar sedang */
-@media (min-width: 641px) and (max-width: 1024px) {
-    body {
-        padding: clamp(18px, 3vw, 30px);
-        gap: 20px;
-    }
-
-    body > header,
-    body > main {
-        width: min(100%, 720px);
-    }
-
-    #startScreen {
-        padding: clamp(28px, 4vw, 40px);
-    }
-
-    #questionCard {
-        padding: clamp(28px, 4vw, 38px);
-    }
-
-    #gameplayScreen {
-        max-width: 540px;
-    }
-
-    #gameplayScreen .numpad-btn {
-        min-height: 64px;
-    }
-}
-
-/* Laptop dan desktop */
-@media (min-width: 1025px) {
-    body {
-        padding: 24px;
-        gap: 18px;
-    }
-
-    body > header,
-    body > main {
-        width: min(100%, 720px);
-    }
-
-    #startScreen {
-        padding: 34px 42px;
-    }
-
-    #gameplayScreen {
-        max-width: 540px;
-    }
-
-    #gameplayScreen .numpad-btn {
-        min-height: 62px;
-    }
-}
-
-/* Layar pendek / HP posisi landscape:
-   halaman boleh digulir agar tombol dan konten tidak terpotong. */
-@media (max-height: 650px) {
-    body {
+      body {
+        width: 100%;
+        min-width: 0;
         min-height: 100vh;
         min-height: 100svh;
-        justify-content: flex-start;
+        height: auto !important;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start !important;
+        align-items: center;
+
+        gap: clamp(12px, 2vh, 22px);
+        padding: max(12px, env(safe-area-inset-top))
+          max(12px, env(safe-area-inset-right))
+          max(12px, env(safe-area-inset-bottom))
+          max(12px, env(safe-area-inset-left));
+
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+      }
+
+      /* HEADER: tombol suara | statistik | tombol rumah */
+      body > header {
+        width: 100%;
+        max-width: 720px;
+
+        display: grid !important;
+        grid-template-columns: 44px minmax(0, 1fr) 44px;
+        align-items: center;
         gap: 10px;
-        padding-top: max(8px, env(safe-area-inset-top));
-        padding-bottom: max(8px, env(safe-area-inset-bottom));
-    }
 
-    body > main {
-        margin-top: 0;
-        margin-bottom: 0;
-        padding-top: 4px;
-        padding-bottom: 4px;
-    }
+        padding: 12px clamp(10px, 3vw, 22px);
+        flex-shrink: 0;
+      }
 
-    #startScreen {
-        padding-top: 18px;
-        padding-bottom: 18px;
-    }
-
-    #startScreen .animate-float {
-        margin-bottom: 10px;
-        padding: 10px;
-    }
-
-    #startScreen h1 {
-        margin-bottom: 8px;
-    }
-
-    #startScreen .mb-6 {
-        margin-bottom: 12px;
-    }
-
-    #questionCard {
-        padding-top: 17px;
-        padding-bottom: 17px;
-        margin-bottom: 12px;
-    }
-
-    #gameplayScreen .numpad-btn {
-        height: 48px;
-        min-height: 48px;
-    }
-
-    body > footer {
-        padding-top: 2px;
-        padding-bottom: 2px;
-    }
-}
-
-/* HP landscape dengan ruang horizontal lebih luas */
-@media (max-height: 500px) and (orientation: landscape) {
-    body {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr);
-        justify-items: center;
-        align-content: start;
-    }
-
-    body > header,
-    body > main,
-    body > footer {
-        width: min(100%, 680px);
-    }
-
-    #startScreen {
-        padding: 14px 20px;
-    }
-
-    #startScreen .animate-float {
-        display: none;
-    }
-
-    #startScreen h1 {
-        font-size: 30px;
-    }
-
-    #startScreen .grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    #gameplayScreen {
-        max-width: 480px;
-    }
-
-    #questionCard {
-        padding: 14px 18px;
-    }
-
-    #gameplayScreen .numpad-btn {
+      body > header > button {
+        width: 42px;
         height: 42px;
-        min-height: 42px;
-    }
-}
+        padding: 0 !important;
 
-/* Cegah elemen panjang membuat halaman melebar. */
-#startScreen *,
-#gameplayScreen *,
-#modalContent * {
-    min-width: 0;
-}
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
 
-#resultModal {
-    overflow-y: auto;
-    overscroll-behavior: contain;
-}
+      body > header > div {
+        width: 100%;
+        min-width: 0;
 
-#modalContent {
-    max-height: min(92vh, 760px);
-    overflow-y: auto;
-}
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        gap: clamp(5px, 2vw, 20px);
+      }
 
-/* Kurangi animasi jika pengguna memilih reduced motion. */
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        scroll-behavior: auto !important;
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-    }
-}
+      body > header > div > div {
+        min-width: 0;
+        flex: 1;
+        text-align: center;
+      }
 
-</style>
-</head>
-<body class="h-full w-full text-white overflow-hidden flex flex-col justify-between p-3 sm:p-6">
+      body > header span {
+        white-space: nowrap;
+      }
 
+      body > header span:first-child {
+        font-size: clamp(9px, 2.5vw, 12px);
+        letter-spacing: 0.06em;
+      }
+
+      #scoreText,
+      #streakText,
+      #timerText {
+        display: inline-block;
+        font-size: clamp(17px, 4.8vw, 28px);
+        line-height: 1.2;
+        white-space: nowrap;
+      }
+
+      /* MAIN CONTENT */
+      body > main {
+        width: 100%;
+        max-width: 720px;
+        min-height: 0;
+        height: auto;
+
+        flex: 1 0 auto;
+        margin: 0 auto !important;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        padding: clamp(4px, 2vh, 20px) 0;
+      }
+
+      #startScreen,
+      #gameplayScreen {
+        width: 100%;
+        min-width: 0;
+      }
+
+      #startScreen {
+        padding: clamp(20px, 4vw, 38px);
+      }
+
+      #startScreen h1 {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        font-size: clamp(27px, 7vw, 48px);
+        line-height: 1.12;
+      }
+
+      #startScreen p {
+        line-height: 1.6;
+      }
+
+      /* PILIHAN MODE */
+      #startScreen .grid {
+        width: 100%;
+      }
+
+      #startScreen .grid button {
+        min-width: 0;
+        gap: 10px;
+      }
+
+      #startScreen .grid button > div {
+        min-width: 0;
+      }
+
+      #startScreen .grid button > div > div:last-child {
+        min-width: 0;
+      }
+
+      #startScreen .grid button .text-xs {
+        line-height: 1.5;
+        white-space: normal;
+      }
+
+      /* AREA PERTANYAAN */
+      #gameplayScreen {
+        max-width: 560px;
+      }
+
+      #questionCard {
+        width: 100%;
+        min-width: 0;
+        padding: clamp(16px, 4vw, 32px);
+      }
+
+      #questionCard > .flex.justify-center.items-center {
+        width: 100%;
+        min-width: 0;
+        gap: clamp(5px, 2vw, 18px);
+        flex-wrap: nowrap;
+      }
+
+      #num1,
+      #num2 {
+        min-width: 0;
+        font-size: clamp(30px, 9vw, 68px);
+        line-height: 1.1;
+        overflow-wrap: anywhere;
+      }
+
+      #questionCard
+        > .flex.justify-center.items-center
+        > span:not(#num1):not(#num2) {
+        flex-shrink: 0;
+        font-size: clamp(24px, 7vw, 52px);
+      }
+
+      #answerBox {
+        min-width: 0;
+        width: clamp(58px, 18vw, 120px);
+        height: clamp(48px, 13vw, 78px);
+        padding: 5px;
+        flex-shrink: 1;
+        font-size: clamp(25px, 7vw, 52px);
+        overflow: hidden;
+      }
+
+      #userAnswerText {
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: clip;
+      }
+
+      #cursor {
+        flex-shrink: 0;
+      }
+
+      /* KEYPAD */
+      #gameplayScreen > .grid {
+        width: 100%;
+        max-width: 430px;
+        gap: clamp(7px, 2vw, 12px);
+      }
+
+      #gameplayScreen .numpad-btn {
+        width: 100%;
+        height: clamp(48px, 12vw, 66px);
+        min-height: 0;
+        padding: 5px;
+        border-radius: 16px;
+        font-size: clamp(20px, 5vw, 30px);
+      }
+
+      /* FOOTER */
+      body > footer {
+        width: 100%;
+        max-width: 720px;
+        flex: 0 0 auto;
+
+        margin-top: auto;
+        padding: 8px 12px;
+
+        text-align: center;
+        font-size: clamp(10px, 2.8vw, 12px);
+        line-height: 1.6;
+
+        overflow-wrap: break-word;
+      }
+
+      /* MODAL HASIL */
+      #resultModal {
+        padding: 14px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+      }
+
+      #modalContent {
+        width: 100%;
+        max-width: 430px;
+        max-height: 92vh;
+        max-height: 92svh;
+        overflow-y: auto;
+        padding: clamp(18px, 5vw, 32px);
+      }
+
+      #modalContent .grid > div {
+        min-width: 0;
+        padding: clamp(10px, 3vw, 16px);
+      }
+
+      #modalContent .flex.gap-3 {
+        width: 100%;
+        gap: 10px;
+      }
+
+      #modalContent .flex.gap-3 button {
+        min-width: 0;
+        padding-left: 7px;
+        padding-right: 7px;
+        font-size: clamp(11px, 3vw, 14px);
+      }
+
+      /* HP KECIL */
+      @media (max-width: 380px) {
+        body {
+          padding: 9px;
+          gap: 12px;
+        }
+
+        body > header {
+          grid-template-columns: 38px minmax(0, 1fr) 38px;
+          gap: 5px;
+          padding: 10px 8px;
+        }
+
+        body > header > button {
+          width: 36px;
+          height: 36px;
+        }
+
+        body > header > div {
+          gap: 3px;
+        }
+
+        body > header span:first-child {
+          font-size: 9px;
+          letter-spacing: 0;
+        }
+
+        #scoreText,
+        #streakText,
+        #timerText {
+          font-size: 17px;
+        }
+
+        #startScreen {
+          padding: 19px 13px;
+        }
+
+        #startScreen h1 {
+          font-size: clamp(25px, 8vw, 30px);
+        }
+
+        #startScreen .grid button {
+          padding: 12px;
+        }
+
+        #startScreen .grid button .w-10 {
+          width: 34px;
+          height: 34px;
+        }
+
+        #questionCard {
+          padding: 17px 10px;
+        }
+
+        #questionCard > .flex.justify-center.items-center {
+          gap: 4px;
+        }
+
+        #num1,
+        #num2 {
+          font-size: clamp(27px, 8vw, 34px);
+        }
+
+        #questionCard
+          > .flex.justify-center.items-center
+          > span:not(#num1):not(#num2) {
+          font-size: 23px;
+        }
+
+        #answerBox {
+          width: 56px;
+          height: 46px;
+          font-size: 24px;
+          border-radius: 12px;
+        }
+
+        #gameplayScreen .numpad-btn {
+          height: 49px;
+          border-radius: 13px;
+        }
+
+        body > footer {
+          padding: 5px 4px;
+        }
+      }
+
+      /* HP NORMAL DAN BESAR */
+      @media (min-width: 381px) and (max-width: 640px) {
+        body > header {
+          padding: 12px 14px;
+        }
+
+        #startScreen {
+          padding: 24px 18px;
+        }
+
+        #questionCard {
+          padding: 22px 14px;
+        }
+      }
+
+      /* TABLET */
+      @media (min-width: 641px) and (max-width: 1024px) {
+        body {
+          padding: 22px;
+          gap: 18px;
+        }
+
+        body > header,
+        body > main,
+        body > footer {
+          max-width: 720px;
+        }
+
+        #gameplayScreen .numpad-btn {
+          height: 64px;
+        }
+      }
+
+      /* LAPTOP DAN DESKTOP */
+      @media (min-width: 1025px) {
+        body {
+          padding: 24px;
+          gap: 18px;
+        }
+
+        body > header,
+        body > main,
+        body > footer {
+          max-width: 760px;
+        }
+
+        #gameplayScreen .numpad-btn {
+          height: 64px;
+        }
+      }
+
+      /* LAYAR PENDEK */
+      @media (max-height: 650px) {
+        body {
+          justify-content: flex-start !important;
+          gap: 8px;
+        }
+
+        body > main {
+          flex: 0 0 auto;
+          padding-top: 4px;
+          padding-bottom: 4px;
+        }
+
+        #startScreen {
+          padding-top: 16px;
+          padding-bottom: 16px;
+        }
+
+        #startScreen .animate-float {
+          margin-bottom: 8px;
+          padding: 9px;
+        }
+
+        #startScreen h1 {
+          margin-bottom: 7px;
+        }
+
+        #startScreen .mb-6 {
+          margin-bottom: 12px;
+        }
+
+        #questionCard {
+          padding-top: 14px;
+          padding-bottom: 14px;
+          margin-bottom: 12px;
+        }
+
+        #gameplayScreen .numpad-btn {
+          height: 45px;
+        }
+      }
+
+      /* HP LANDSCAPE */
+      @media (max-height: 500px) and (orientation: landscape) {
+        body {
+          gap: 7px;
+        }
+
+        body > header,
+        body > main,
+        body > footer {
+          max-width: 680px;
+        }
+
+        #startScreen {
+          padding: 12px 20px;
+        }
+
+        #startScreen .animate-float {
+          display: none;
+        }
+
+        #startScreen h1 {
+          font-size: 28px;
+        }
+
+        #startScreen .grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        #questionCard {
+          padding: 12px 18px;
+          margin-bottom: 9px;
+        }
+
+        #gameplayScreen .numpad-btn {
+          height: 40px;
+        }
+      }
+
+      /* PENCEGAHAN OVERFLOW */
+      #startScreen *,
+      #gameplayScreen *,
+      #modalContent * {
+        min-width: 0;
+      }
+
+      button {
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+        cursor: pointer;
+      }
+
+      button:focus-visible {
+        outline: 3px solid rgba(103, 232, 249, 0.9);
+        outline-offset: 3px;
+      }
+
+      /* AKSESIBILITAS */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="h-full w-full text-white overflow-hidden flex flex-col justify-between p-3 sm:p-6"
+  >
     <!-- Particle Canvas Layer for Effects -->
     <canvas id="particleCanvas"></canvas>
 
     <!-- Header Stats Bar -->
-    <header class="w-full max-w-2xl mx-auto flex justify-between items-center glass-panel rounded-2xl px-4 py-3 sm:px-6 sm:py-4 shadow-2xl relative z-10">
-        <!-- Sound Toggle -->
-        <button id="soundToggleBtn" class="p-2 sm:p-3 glass-button rounded-xl text-yellow-400 hover:text-yellow-300 focus:outline-none">
-            <i id="soundIcon" class="fas fa-volume-up text-lg sm:text-xl"></i>
-        </button>
+    <header
+      class="w-full max-w-2xl mx-auto flex justify-between items-center glass-panel rounded-2xl px-4 py-3 sm:px-6 sm:py-4 shadow-2xl relative z-10"
+    >
+      <!-- Sound Toggle -->
+      <button
+        id="soundToggleBtn"
+        class="p-2 sm:p-3 glass-button rounded-xl text-yellow-400 hover:text-yellow-300 focus:outline-none"
+      >
+        <i id="soundIcon" class="fas fa-volume-up text-lg sm:text-xl"></i>
+      </button>
 
-        <!-- Stats Container -->
-        <div class="flex items-center gap-4 sm:gap-8">
-            <!-- Score -->
-            <div class="text-center">
-                <span class="block text-xs uppercase tracking-wider text-slate-400 font-bold">Skor</span>
-                <span id="scoreText" class="font-display text-xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">0</span>
-            </div>
-
-            <!-- Streak Counter -->
-            <div class="text-center">
-                <span class="block text-xs uppercase tracking-wider text-slate-400 font-bold">Streak</span>
-                <div class="flex items-center justify-center gap-1">
-                    <i class="fas fa-fire text-amber-500 text-sm sm:text-base animate-pulse"></i>
-                    <span id="streakText" class="font-display text-xl sm:text-3xl font-extrabold text-amber-400">0x</span>
-                </div>
-            </div>
-
-            <!-- Timer Display -->
-            <div class="text-center min-w-[60px]">
-                <span class="block text-xs uppercase tracking-wider text-slate-400 font-bold">Waktu</span>
-                <span id="timerText" class="font-display text-xl sm:text-3xl font-extrabold text-emerald-400">60s</span>
-            </div>
+      <!-- Stats Container -->
+      <div class="flex items-center gap-4 sm:gap-8">
+        <!-- Score -->
+        <div class="text-center">
+          <span
+            class="block text-xs uppercase tracking-wider text-slate-400 font-bold"
+            >Skor</span
+          >
+          <span
+            id="scoreText"
+            class="font-display text-xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400"
+            >0</span
+          >
         </div>
 
-        <!-- Home/Exit Button -->
-        <button id="homeBtn" class="p-2 sm:p-3 glass-button rounded-xl text-rose-400 hover:text-rose-300 focus:outline-none">
-            <i class="fas fa-house text-lg sm:text-xl"></i>
-        </button>
+        <!-- Streak Counter -->
+        <div class="text-center">
+          <span
+            class="block text-xs uppercase tracking-wider text-slate-400 font-bold"
+            >Streak</span
+          >
+          <div class="flex items-center justify-center gap-1">
+            <i
+              class="fas fa-fire text-amber-500 text-sm sm:text-base animate-pulse"
+            ></i>
+            <span
+              id="streakText"
+              class="font-display text-xl sm:text-3xl font-extrabold text-amber-400"
+              >0x</span
+            >
+          </div>
+        </div>
+
+        <!-- Timer Display -->
+        <div class="text-center min-w-[60px]">
+          <span
+            class="block text-xs uppercase tracking-wider text-slate-400 font-bold"
+            >Waktu</span
+          >
+          <span
+            id="timerText"
+            class="font-display text-xl sm:text-3xl font-extrabold text-emerald-400"
+            >60s</span
+          >
+        </div>
+      </div>
+
+      <!-- Home/Exit Button -->
+      <button
+        id="homeBtn"
+        aria-label="Kembali ke menu utama"
+        title="Menu utama"
+        class="glass-button rounded-xl text-rose-400 hover:text-rose-300 focus:outline-none"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="m3 10 9-7 9 7"></path>
+          <path d="M5 9v11h14V9"></path>
+          <path d="M9 20v-6h6v6"></path>
+        </svg>
+      </button>
     </header>
 
     <!-- Main Game Area -->
-    <main class="w-full max-w-2xl mx-auto flex-1 flex flex-col justify-center items-center py-4 relative z-10 my-auto">
-        
-        <!-- Screen 1: Mode & Level Selector -->
-        <div id="startScreen" class="w-full glass-panel rounded-3xl p-6 sm:p-8 text-center shadow-2xl flex flex-col items-center">
-            <div class="inline-block p-4 bg-blue-600/30 rounded-full mb-4 animate-float">
-                <i class="fas fa-calculator text-4xl sm:text-5xl text-cyan-400"></i>
-            </div>
-            <h1 class="font-display text-3xl sm:text-5xl font-black mb-2 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400">
-                RISKI MATH QUEST
-            </h1>
-            <p class="text-slate-300 text-sm sm:text-base mb-6 max-w-md">
-                Asah kemampuan berhitung cepatmu! Pilih tingkat kesulitan dan raih skor tertinggi!
-            </p>
+    <main
+      class="w-full max-w-2xl mx-auto flex-1 flex flex-col justify-center items-center py-4 relative z-10 my-auto"
+    >
+      <!-- Screen 1: Mode & Level Selector -->
+      <div
+        id="startScreen"
+        class="w-full glass-panel rounded-3xl p-6 sm:p-8 text-center shadow-2xl flex flex-col items-center"
+      >
+        <div
+          class="inline-block p-4 bg-blue-600/30 rounded-full mb-4 animate-float"
+        >
+          <i class="fas fa-calculator text-4xl sm:text-5xl text-cyan-400"></i>
+        </div>
+        <h1
+          class="font-display text-3xl sm:text-5xl font-black mb-2 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400"
+        >
+          RISKI MATH QUEST
+        </h1>
+        <p class="text-slate-300 text-sm sm:text-base mb-6 max-w-md">
+          Asah kemampuan berhitung cepatmu! Pilih tingkat kesulitan dan raih
+          skor tertinggi!
+        </p>
 
-            <!-- Highscore Badge -->
-            <div class="bg-white/5 border border-white/10 rounded-xl px-4 py-2 mb-6 inline-flex items-center gap-2">
-                <i class="fas fa-trophy text-amber-400 text-lg"></i>
-                <span class="text-xs text-slate-400">High Score:</span>
-                <span id="highScoreText" class="font-bold text-amber-300">0</span>
-            </div>
-
-            <!-- Mode Selector Buttons -->
-            <div class="w-full max-w-md grid grid-cols-1 gap-3 sm:gap-4 mb-2">
-                <button onclick="startGame('easy')" class="glass-button p-4 rounded-2xl text-left flex items-center justify-between hover:bg-emerald-500/20 hover:border-emerald-500/50 group transition">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-lg group-hover:scale-110 transition">1</div>
-                        <div>
-                            <div class="font-bold text-emerald-400">Mudah</div>
-                            <div class="text-xs text-slate-400">Penjumlahan 1 Digit (1-9)</div>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition"></i>
-                </button>
-
-                <button onclick="startGame('medium')" class="glass-button p-4 rounded-2xl text-left flex items-center justify-between hover:bg-blue-500/20 hover:border-blue-500/50 group transition">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-lg group-hover:scale-110 transition">2</div>
-                        <div>
-                            <div class="font-bold text-blue-400">Sedang</div>
-                            <div class="text-xs text-slate-400">Penjumlahan 2 Digit (10-99)</div>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition"></i>
-                </button>
-
-                <button onclick="startGame('hard')" class="glass-button p-4 rounded-2xl text-left flex items-center justify-between hover:bg-purple-500/20 hover:border-purple-500/50 group transition">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-lg group-hover:scale-110 transition">3</div>
-                        <div>
-                            <div class="font-bold text-purple-400">Sulit</div>
-                            <div class="text-xs text-slate-400">Penjumlahan 3 Digit (100-999)</div>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right text-slate-500 group-hover:text-purple-400 group-hover:translate-x-1 transition"></i>
-                </button>
-
-                <button onclick="startGame('rush')" class="glass-button p-4 rounded-2xl text-left flex items-center justify-between hover:bg-amber-500/20 hover:border-amber-500/50 group transition">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg group-hover:scale-110 transition">
-                            <i class="fas fa-bolt"></i>
-                        </div>
-                        <div>
-                            <div class="font-bold text-amber-400">Speed Rush</div>
-                            <div class="text-xs text-slate-400">Waktu Cepat! (Waktu bertambah jika benar)</div>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right text-slate-500 group-hover:text-amber-400 group-hover:translate-x-1 transition"></i>
-                </button>
-            </div>
+        <!-- Highscore Badge -->
+        <div
+          class="bg-white/5 border border-white/10 rounded-xl px-4 py-2 mb-6 inline-flex items-center gap-2"
+        >
+          <i class="fas fa-trophy text-amber-400 text-lg"></i>
+          <span class="text-xs text-slate-400">High Score:</span>
+          <span id="highScoreText" class="font-bold text-amber-300">0</span>
         </div>
 
-        <!-- Screen 2: Active Gameplay Board -->
-        <div id="gameplayScreen" class="w-full flex flex-col items-center justify-center hidden">
-            <!-- Question Box -->
-            <div id="questionCard" class="w-full glass-panel rounded-3xl p-6 sm:p-8 text-center mb-6 shadow-2xl relative overflow-hidden transition-all duration-300">
-                <!-- Visual Timer Bar -->
-                <div class="absolute top-0 left-0 h-1.5 bg-gradient-to-r from-cyan-400 to-emerald-400 w-full transition-all duration-1000 ease-linear" id="progressBar"></div>
-
-                <div class="text-xs sm:text-sm font-semibold tracking-wider text-slate-400 uppercase mb-2" id="modeIndicator">Mode: Easy</div>
-                
-                <!-- Math Math Equation -->
-                <div class="flex justify-center items-center gap-3 sm:gap-6 my-4">
-                    <span id="num1" class="font-display text-4xl sm:text-7xl font-extrabold text-white">12</span>
-                    <span class="font-display text-3xl sm:text-6xl font-bold text-cyan-400">+</span>
-                    <span id="num2" class="font-display text-4xl sm:text-7xl font-extrabold text-white">15</span>
-                    <span class="font-display text-3xl sm:text-6xl font-bold text-cyan-400">=</span>
-                    <!-- Answer display inside equation -->
-                    <div id="answerBox" class="min-w-[70px] sm:min-w-[120px] h-14 sm:h-20 bg-slate-900/60 border-2 border-cyan-400/50 rounded-2xl flex items-center justify-center px-3 sm:px-4 text-3xl sm:text-6xl font-extrabold text-amber-300 shadow-inner">
-                        <span id="userAnswerText"></span>
-                        <span class="inline-block w-1 h-8 bg-amber-400 ml-1 animate-pulse" id="cursor"></span>
-                    </div>
+        <!-- Mode Selector Buttons -->
+        <div class="w-full max-w-md grid grid-cols-1 gap-3 sm:gap-4 mb-2">
+          <button
+            onclick="startGame('easy')"
+            class="glass-button p-4 rounded-2xl text-left flex items-center justify-between hover:bg-emerald-500/20 hover:border-emerald-500/50 group transition"
+          >
+            <div class="flex items-center gap-3">
+              <div
+                class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-lg group-hover:scale-110 transition"
+              >
+                1
+              </div>
+              <div>
+                <div class="font-bold text-emerald-400">Mudah</div>
+                <div class="text-xs text-slate-400">
+                  Penjumlahan 1 Digit (1-9)
                 </div>
+              </div>
+            </div>
+            <i
+              class="fas fa-chevron-right text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition"
+            ></i>
+          </button>
 
-                <!-- Feedback Text -->
-                <div id="feedbackText" class="h-6 text-sm font-bold opacity-0 transition-opacity duration-200">
-                    Hebat! +10
+          <button
+            onclick="startGame('medium')"
+            class="glass-button p-4 rounded-2xl text-left flex items-center justify-between hover:bg-blue-500/20 hover:border-blue-500/50 group transition"
+          >
+            <div class="flex items-center gap-3">
+              <div
+                class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-lg group-hover:scale-110 transition"
+              >
+                2
+              </div>
+              <div>
+                <div class="font-bold text-blue-400">Sedang</div>
+                <div class="text-xs text-slate-400">
+                  Penjumlahan 2 Digit (10-99)
                 </div>
+              </div>
             </div>
+            <i
+              class="fas fa-chevron-right text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition"
+            ></i>
+          </button>
 
-            <!-- Virtual Keypad (Optimized for Mobile/Touch & Desktop) -->
-            <div class="w-full max-w-md grid grid-cols-3 gap-2 sm:gap-3">
-                <button onclick="pressNumpad('1')" class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-display text-2xl sm:text-3xl font-bold text-white hover:bg-white/20">1</button>
-                <button onclick="pressNumpad('2')" class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-display text-2xl sm:text-3xl font-bold text-white hover:bg-white/20">2</button>
-                <button onclick="pressNumpad('3')" class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-display text-2xl sm:text-3xl font-bold text-white hover:bg-white/20">3</button>
-                
-                <button onclick="pressNumpad('4')" class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-display text-2xl sm:text-3xl font-bold text-white hover:bg-white/20">4</button>
-                <button onclick="pressNumpad('5')" class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-display text-2xl sm:text-3xl font-bold text-white hover:bg-white/20">5</button>
-                <button onclick="pressNumpad('6')" class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-display text-2xl sm:text-3xl font-bold text-white hover:bg-white/20">6</button>
-                
-                <button onclick="pressNumpad('7')" class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-display text-2xl sm:text-3xl font-bold text-white hover:bg-white/20">7</button>
-                <button onclick="pressNumpad('8')" class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-display text-2xl sm:text-3xl font-bold text-white hover:bg-white/20">8</button>
-                <button onclick="pressNumpad('9')" class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-display text-2xl sm:text-3xl font-bold text-white hover:bg-white/20">9</button>
-                
-                <button onclick="clearAnswer()" class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-bold text-rose-400 hover:bg-rose-500/20 flex items-center justify-center text-xl">
-                    <i class="fas fa-backspace"></i>
-                </button>
-                <button onclick="pressNumpad('0')" class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-display text-2xl sm:text-3xl font-bold text-white hover:bg-white/20">0</button>
-                <button onclick="submitAnswer()" class="numpad-btn bg-gradient-to-r from-emerald-500 to-teal-600 h-14 sm:h-16 rounded-2xl font-bold text-white hover:from-emerald-400 hover:to-teal-500 shadow-lg shadow-emerald-900/40 flex items-center justify-center text-2xl">
-                    <i class="fas fa-check"></i>
-                </button>
+          <button
+            onclick="startGame('hard')"
+            class="glass-button p-4 rounded-2xl text-left flex items-center justify-between hover:bg-purple-500/20 hover:border-purple-500/50 group transition"
+          >
+            <div class="flex items-center gap-3">
+              <div
+                class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-lg group-hover:scale-110 transition"
+              >
+                3
+              </div>
+              <div>
+                <div class="font-bold text-purple-400">Sulit</div>
+                <div class="text-xs text-slate-400">
+                  Penjumlahan 3 Digit (100-999)
+                </div>
+              </div>
             </div>
+            <i
+              class="fas fa-chevron-right text-slate-500 group-hover:text-purple-400 group-hover:translate-x-1 transition"
+            ></i>
+          </button>
+
+          <button
+            onclick="startGame('rush')"
+            class="glass-button p-4 rounded-2xl text-left flex items-center justify-between hover:bg-amber-500/20 hover:border-amber-500/50 group transition"
+          >
+            <div class="flex items-center gap-3">
+              <div
+                class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg group-hover:scale-110 transition"
+              >
+                <i class="fas fa-bolt"></i>
+              </div>
+              <div>
+                <div class="font-bold text-amber-400">Speed Rush</div>
+                <div class="text-xs text-slate-400">
+                  Waktu Cepat! (Waktu bertambah jika benar)
+                </div>
+              </div>
+            </div>
+            <i
+              class="fas fa-chevron-right text-slate-500 group-hover:text-amber-400 group-hover:translate-x-1 transition"
+            ></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Screen 2: Active Gameplay Board -->
+      <div
+        id="gameplayScreen"
+        class="w-full flex flex-col items-center justify-center hidden"
+      >
+        <!-- Question Box -->
+        <div
+          id="questionCard"
+          class="w-full glass-panel rounded-3xl p-6 sm:p-8 text-center mb-6 shadow-2xl relative overflow-hidden transition-all duration-300"
+        >
+          <!-- Visual Timer Bar -->
+          <div
+            class="absolute top-0 left-0 h-1.5 bg-gradient-to-r from-cyan-400 to-emerald-400 w-full transition-all duration-1000 ease-linear"
+            id="progressBar"
+          ></div>
+
+          <div
+            class="text-xs sm:text-sm font-semibold tracking-wider text-slate-400 uppercase mb-2"
+            id="modeIndicator"
+          >
+            Mode: Easy
+          </div>
+
+          <!-- Math Math Equation -->
+          <div class="flex justify-center items-center gap-3 sm:gap-6 my-4">
+            <span
+              id="num1"
+              class="font-display text-4xl sm:text-7xl font-extrabold text-white"
+              >12</span
+            >
+            <span
+              class="font-display text-3xl sm:text-6xl font-bold text-cyan-400"
+              >+</span
+            >
+            <span
+              id="num2"
+              class="font-display text-4xl sm:text-7xl font-extrabold text-white"
+              >15</span
+            >
+            <span
+              class="font-display text-3xl sm:text-6xl font-bold text-cyan-400"
+              >=</span
+            >
+            <!-- Answer display inside equation -->
+            <div
+              id="answerBox"
+              class="min-w-[70px] sm:min-w-[120px] h-14 sm:h-20 bg-slate-900/60 border-2 border-cyan-400/50 rounded-2xl flex items-center justify-center px-3 sm:px-4 text-3xl sm:text-6xl font-extrabold text-amber-300 shadow-inner"
+            >
+              <span id="userAnswerText"></span>
+              <span
+                class="inline-block w-1 h-8 bg-amber-400 ml-1 animate-pulse"
+                id="cursor"
+              ></span>
+            </div>
+          </div>
+
+          <!-- Feedback Text -->
+          <div
+            id="feedbackText"
+            class="h-6 text-sm font-bold opacity-0 transition-opacity duration-200"
+          >
+            Hebat! +10
+          </div>
         </div>
 
+        <!-- Virtual Keypad (Optimized for Mobile/Touch & Desktop) -->
+        <div class="w-full max-w-md grid grid-cols-3 gap-2 sm:gap-3">
+          <button
+            onclick="pressNumpad('1')"
+            class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-display text-2xl sm:text-3xl font-bold text-white hover:bg-white/20"
+          >
+            1
+          </button>
+          <button
+            onclick="pressNumpad('2')"
+            class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-display text-2xl sm:text-3xl font-bold text-white hover:bg-white/20"
+          >
+            2
+          </button>
+          <button
+            onclick="pressNumpad('3')"
+            class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-display text-2xl sm:text-3xl font-bold text-white hover:bg-white/20"
+          >
+            3
+          </button>
+
+          <button
+            onclick="pressNumpad('4')"
+            class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-display text-2xl sm:text-3xl font-bold text-white hover:bg-white/20"
+          >
+            4
+          </button>
+          <button
+            onclick="pressNumpad('5')"
+            class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-display text-2xl sm:text-3xl font-bold text-white hover:bg-white/20"
+          >
+            5
+          </button>
+          <button
+            onclick="pressNumpad('6')"
+            class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-display text-2xl sm:text-3xl font-bold text-white hover:bg-white/20"
+          >
+            6
+          </button>
+
+          <button
+            onclick="pressNumpad('7')"
+            class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-display text-2xl sm:text-3xl font-bold text-white hover:bg-white/20"
+          >
+            7
+          </button>
+          <button
+            onclick="pressNumpad('8')"
+            class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-display text-2xl sm:text-3xl font-bold text-white hover:bg-white/20"
+          >
+            8
+          </button>
+          <button
+            onclick="pressNumpad('9')"
+            class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-display text-2xl sm:text-3xl font-bold text-white hover:bg-white/20"
+          >
+            9
+          </button>
+
+          <button
+            onclick="clearAnswer()"
+            class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-bold text-rose-400 hover:bg-rose-500/20 flex items-center justify-center text-xl"
+          >
+            <i class="fas fa-backspace"></i>
+          </button>
+          <button
+            onclick="pressNumpad('0')"
+            class="numpad-btn glass-button h-14 sm:h-16 rounded-2xl font-display text-2xl sm:text-3xl font-bold text-white hover:bg-white/20"
+          >
+            0
+          </button>
+          <button
+            onclick="submitAnswer()"
+            class="numpad-btn bg-gradient-to-r from-emerald-500 to-teal-600 h-14 sm:h-16 rounded-2xl font-bold text-white hover:from-emerald-400 hover:to-teal-500 shadow-lg shadow-emerald-900/40 flex items-center justify-center text-2xl"
+          >
+            <i class="fas fa-check"></i>
+          </button>
+        </div>
+      </div>
     </main>
 
     <!-- Modal Summary / Game Over Screen -->
-    <div id="resultModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden opacity-0 transition-opacity duration-300">
-        <div class="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-8 text-center shadow-2xl border border-white/20 transform scale-95 transition-transform duration-300" id="modalContent">
-            
-            <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 animate-bounce">
-                <i class="fas fa-trophy"></i>
-            </div>
-
-            <h2 class="font-display text-3xl font-extrabold text-white mb-1">Permainan Selesai!</h2>
-            <p id="modalSubtitle" class="text-slate-400 text-sm mb-6">Hasil latihan berhitungmu kali ini</p>
-
-            <!-- Stats Overview Grid -->
-            <div class="grid grid-cols-2 gap-3 mb-6">
-                <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
-                    <span class="block text-xs text-slate-400 font-semibold mb-1">Total Skor</span>
-                    <span id="finalScore" class="text-2xl sm:text-3xl font-black text-cyan-400">0</span>
-                </div>
-                <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
-                    <span class="block text-xs text-slate-400 font-semibold mb-1">Akurasi</span>
-                    <span id="finalAccuracy" class="text-2xl sm:text-3xl font-black text-emerald-400">0%</span>
-                </div>
-                <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
-                    <span class="block text-xs text-slate-400 font-semibold mb-1">Max Streak</span>
-                    <span id="finalStreak" class="text-2xl sm:text-3xl font-black text-amber-400">0</span>
-                </div>
-                <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
-                    <span class="block text-xs text-slate-400 font-semibold mb-1">Benar / Total</span>
-                    <span id="finalCount" class="text-2xl sm:text-3xl font-black text-purple-400">0/0</span>
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex gap-3">
-                <button onclick="closeModalAndGoHome()" class="w-1/2 glass-button py-3.5 rounded-2xl font-bold text-slate-300 hover:bg-white/20">
-                    <i class="fas fa-house mr-2"></i> Menu
-                </button>
-                <button onclick="restartGame()" class="w-1/2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 py-3.5 rounded-2xl font-bold text-white shadow-lg shadow-cyan-900/40">
-                    <i class="fas fa-redo mr-2"></i> Main Lagi
-                </button>
-            </div>
+    <div
+      id="resultModal"
+      class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden opacity-0 transition-opacity duration-300"
+    >
+      <div
+        class="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-8 text-center shadow-2xl border border-white/20 transform scale-95 transition-transform duration-300"
+        id="modalContent"
+      >
+        <div
+          class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 animate-bounce"
+        >
+          <i class="fas fa-trophy"></i>
         </div>
+
+        <h2 class="font-display text-3xl font-extrabold text-white mb-1">
+          Permainan Selesai!
+        </h2>
+        <p id="modalSubtitle" class="text-slate-400 text-sm mb-6">
+          Hasil latihan berhitungmu kali ini
+        </p>
+
+        <!-- Stats Overview Grid -->
+        <div class="grid grid-cols-2 gap-3 mb-6">
+          <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
+            <span class="block text-xs text-slate-400 font-semibold mb-1"
+              >Total Skor</span
+            >
+            <span
+              id="finalScore"
+              class="text-2xl sm:text-3xl font-black text-cyan-400"
+              >0</span
+            >
+          </div>
+          <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
+            <span class="block text-xs text-slate-400 font-semibold mb-1"
+              >Akurasi</span
+            >
+            <span
+              id="finalAccuracy"
+              class="text-2xl sm:text-3xl font-black text-emerald-400"
+              >0%</span
+            >
+          </div>
+          <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
+            <span class="block text-xs text-slate-400 font-semibold mb-1"
+              >Max Streak</span
+            >
+            <span
+              id="finalStreak"
+              class="text-2xl sm:text-3xl font-black text-amber-400"
+              >0</span
+            >
+          </div>
+          <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
+            <span class="block text-xs text-slate-400 font-semibold mb-1"
+              >Benar / Total</span
+            >
+            <span
+              id="finalCount"
+              class="text-2xl sm:text-3xl font-black text-purple-400"
+              >0/0</span
+            >
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-3">
+          <button
+            onclick="closeModalAndGoHome()"
+            class="w-1/2 glass-button py-3.5 rounded-2xl font-bold text-slate-300 hover:bg-white/20"
+          >
+            <i class="fas fa-house mr-2"></i> Menu
+          </button>
+          <button
+            onclick="restartGame()"
+            class="w-1/2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 py-3.5 rounded-2xl font-bold text-white shadow-lg shadow-cyan-900/40"
+          >
+            <i class="fas fa-redo mr-2"></i> Main Lagi
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Footer Info -->
-   
+    <footer
+      class="w-full text-center py-2 text-xs text-slate-500 relative z-10"
+    >
+      <span
+        >Tekan angka pada keyboard atau gunakan tombol angka di layar untuk
+        menjawab.</span
+      >
+    </footer>
 
     <!-- Game Logic Script -->
     <script>
-        // --- Web Audio API Synthesizer (No external sound files required) ---
-        class SoundEffects {
-            constructor() {
-                this.ctx = null;
-                this.muted = false;
-            }
-
-            init() {
-                if (!this.ctx) {
-                    const AudioContext = window.AudioContext || window.webkitAudioContext;
-                    this.ctx = new AudioContext();
-                }
-            }
-
-            playCorrect() {
-                if (this.muted) return;
-                this.init();
-                const now = this.ctx.currentTime;
-                
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(523.25, now); // C5
-                osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
-                osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2); // G5
-                
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-                
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                
-                osc.start(now);
-                osc.stop(now + 0.3);
-            }
-
-            playWrong() {
-                if (this.muted) return;
-                this.init();
-                const now = this.ctx.currentTime;
-                
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(220, now); // A3
-                osc.frequency.linearRampToValueAtTime(130, now + 0.25); // C3
-                
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-                
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                
-                osc.start(now);
-                osc.stop(now + 0.25);
-            }
-
-            playGameOver() {
-                if (this.muted) return;
-                this.init();
-                const now = this.ctx.currentTime;
-                
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(400, now);
-                osc.frequency.linearRampToValueAtTime(200, now + 0.5);
-                
-                gain.gain.setValueAtTime(0.4, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
-                
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                
-                osc.start(now);
-                osc.stop(now + 0.6);
-            }
+      // --- Web Audio API Synthesizer (No external sound files required) ---
+      class SoundEffects {
+        constructor() {
+          this.ctx = null;
+          this.muted = false;
         }
 
-        const soundFX = new SoundEffects();
-
-        // --- Particle System (Confetti / Canvas Effects) ---
-        const canvas = document.getElementById('particleCanvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        class Particle {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.size = Math.random() * 8 + 4;
-                this.speedX = (Math.random() - 0.5) * 12;
-                this.speedY = (Math.random() - 0.7) * 12;
-                this.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
-                this.gravity = 0.4;
-                this.alpha = 1;
-                this.decay = Math.random() * 0.02 + 0.015;
-            }
-
-            update() {
-                this.speedY += this.gravity;
-                this.x += this.speedX;
-                this.y += this.speedY;
-                this.alpha -= this.decay;
-            }
-
-            draw() {
-                ctx.save();
-                ctx.globalAlpha = Math.max(0, this.alpha);
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            }
+        init() {
+          if (!this.ctx) {
+            const AudioContext =
+              window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioContext();
+          }
         }
 
-        function triggerConfetti() {
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2 - 50;
-            for (let i = 0; i < 40; i++) {
-                particles.push(new Particle(centerX, centerY));
-            }
+        playCorrect() {
+          if (this.muted) return;
+          this.init();
+          const now = this.ctx.currentTime;
+
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+          osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2); // G5
+
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + 0.3);
         }
 
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = particles.length - 1; i >= 0; i--) {
-                particles[i].update();
-                particles[i].draw();
-                if (particles[i].alpha <= 0) {
-                    particles.splice(i, 1);
-                }
-            }
-            requestAnimationFrame(animateParticles);
-        }
-        animateParticles();
+        playWrong() {
+          if (this.muted) return;
+          this.init();
+          const now = this.ctx.currentTime;
 
-        // --- Game State Variables ---
-        let currentMode = 'easy';
-        let num1 = 0;
-        let num2 = 0;
-        let correctAnswer = 0;
-        let userAnswer = '';
-        let score = 0;
-        let streak = 0;
-        let maxStreak = 0;
-        let totalQuestions = 0;
-        let correctQuestions = 0;
-        let timeLeft = 60;
-        let totalTime = 60;
-        let timerInterval = null;
-        let highScore = localStorage.getItem('math_quest_highscore') || 0;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
 
-        // UI Element References
-        const startScreen = document.getElementById('startScreen');
-        const gameplayScreen = document.getElementById('gameplayScreen');
-        const resultModal = document.getElementById('resultModal');
-        const modalContent = document.getElementById('modalContent');
-        const scoreText = document.getElementById('scoreText');
-        const streakText = document.getElementById('streakText');
-        const timerText = document.getElementById('timerText');
-        const userAnswerText = document.getElementById('userAnswerText');
-        const feedbackText = document.getElementById('feedbackText');
-        const questionCard = document.getElementById('questionCard');
-        const progressBar = document.getElementById('progressBar');
-        const highScoreText = document.getElementById('highScoreText');
-        const soundToggleBtn = document.getElementById('soundToggleBtn');
-        const soundIcon = document.getElementById('soundIcon');
-        const modeIndicator = document.getElementById('modeIndicator');
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(220, now); // A3
+          osc.frequency.linearRampToValueAtTime(130, now + 0.25); // C3
 
-        // Init High Score Display
-        highScoreText.textContent = highScore;
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
 
-        // Toggle Sound Mute
-        soundToggleBtn.addEventListener('click', () => {
-            soundFX.muted = !soundFX.muted;
-            if (soundFX.muted) {
-                soundIcon.className = 'fas fa-volume-mute text-rose-400';
-            } else {
-                soundIcon.className = 'fas fa-volume-up text-yellow-400';
-                soundFX.playCorrect();
-            }
-        });
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
 
-        document.getElementById('homeBtn').addEventListener('click', () => {
-            if (!gameplayScreen.classList.contains('hidden')) {
-                if (confirm('Apakah kamu yakin ingin keluar ke menu utama?')) {
-                    endGame();
-                    closeModalAndGoHome();
-                }
-            }
-        });
-
-        // --- Game Logic Functions ---
-        function startGame(mode) {
-            currentMode = mode;
-            score = 0;
-            streak = 0;
-            maxStreak = 0;
-            totalQuestions = 0;
-            correctQuestions = 0;
-            userAnswer = '';
-
-            // Mode Configurations
-            if (mode === 'easy') {
-                totalTime = 45;
-                modeIndicator.textContent = 'Mode: Mudah (1 Digit)';
-            } else if (mode === 'medium') {
-                totalTime = 60;
-                modeIndicator.textContent = 'Mode: Sedang (2 Digit)';
-            } else if (mode === 'hard') {
-                totalTime = 60;
-                modeIndicator.textContent = 'Mode: Sulit (3 Digit)';
-            } else if (mode === 'rush') {
-                totalTime = 20;
-                modeIndicator.textContent = 'Mode: Speed Rush';
-            }
-
-            timeLeft = totalTime;
-            
-            // Update UI
-            updateStatsUI();
-            startScreen.classList.add('hidden');
-            gameplayScreen.classList.remove('hidden');
-
-            generateQuestion();
-            startTimer();
+          osc.start(now);
+          osc.stop(now + 0.25);
         }
 
-        function generateQuestion() {
-            userAnswer = '';
-            userAnswerText.textContent = '';
-            
-            if (currentMode === 'easy') {
-                num1 = Math.floor(Math.random() * 9) + 1;
-                num2 = Math.floor(Math.random() * 9) + 1;
-            } else if (currentMode === 'medium') {
-                num1 = Math.floor(Math.random() * 90) + 10;
-                num2 = Math.floor(Math.random() * 90) + 10;
-            } else if (currentMode === 'hard') {
-                num1 = Math.floor(Math.random() * 900) + 100;
-                num2 = Math.floor(Math.random() * 900) + 100;
-            } else if (currentMode === 'rush') {
-                // Mix of digits in speed rush
-                const isTwoDigit = Math.random() > 0.4;
-                num1 = isTwoDigit ? Math.floor(Math.random() * 40) + 10 : Math.floor(Math.random() * 9) + 1;
-                num2 = isTwoDigit ? Math.floor(Math.random() * 40) + 10 : Math.floor(Math.random() * 9) + 1;
-            }
+        playGameOver() {
+          if (this.muted) return;
+          this.init();
+          const now = this.ctx.currentTime;
 
-            correctAnswer = num1 + num2;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
 
-            document.getElementById('num1').textContent = num1;
-            document.getElementById('num2').textContent = num2;
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(400, now);
+          osc.frequency.linearRampToValueAtTime(200, now + 0.5);
 
-            // Trigger Pop animation on card
-            questionCard.classList.remove('animate-pop');
-            void questionCard.offsetWidth; // Force reflow
-            questionCard.classList.add('animate-pop');
+          gain.gain.setValueAtTime(0.4, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + 0.6);
+        }
+      }
+
+      const soundFX = new SoundEffects();
+
+      // --- Particle System (Confetti / Canvas Effects) ---
+      const canvas = document.getElementById("particleCanvas");
+      const ctx = canvas.getContext("2d");
+      let particles = [];
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+
+      class Particle {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+          this.size = Math.random() * 8 + 4;
+          this.speedX = (Math.random() - 0.5) * 12;
+          this.speedY = (Math.random() - 0.7) * 12;
+          this.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+          this.gravity = 0.4;
+          this.alpha = 1;
+          this.decay = Math.random() * 0.02 + 0.015;
         }
 
-        function pressNumpad(val) {
-            if (userAnswer.length < 5) {
-                userAnswer += val;
-                userAnswerText.textContent = userAnswer;
-            }
+        update() {
+          this.speedY += this.gravity;
+          this.x += this.speedX;
+          this.y += this.speedY;
+          this.alpha -= this.decay;
         }
 
-        function clearAnswer() {
-            userAnswer = userAnswer.slice(0, -1);
-            userAnswerText.textContent = userAnswer;
+        draw() {
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, this.alpha);
+          ctx.fillStyle = this.color;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      function triggerConfetti() {
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2 - 50;
+        for (let i = 0; i < 40; i++) {
+          particles.push(new Particle(centerX, centerY));
+        }
+      }
+
+      function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = particles.length - 1; i >= 0; i--) {
+          particles[i].update();
+          particles[i].draw();
+          if (particles[i].alpha <= 0) {
+            particles.splice(i, 1);
+          }
+        }
+        requestAnimationFrame(animateParticles);
+      }
+      animateParticles();
+
+      // --- Game State Variables ---
+      let currentMode = "easy";
+      let num1 = 0;
+      let num2 = 0;
+      let correctAnswer = 0;
+      let userAnswer = "";
+      let score = 0;
+      let streak = 0;
+      let maxStreak = 0;
+      let totalQuestions = 0;
+      let correctQuestions = 0;
+      let timeLeft = 60;
+      let totalTime = 60;
+      let timerInterval = null;
+      let highScore = localStorage.getItem("math_quest_highscore") || 0;
+
+      // UI Element References
+      const startScreen = document.getElementById("startScreen");
+      const gameplayScreen = document.getElementById("gameplayScreen");
+      const resultModal = document.getElementById("resultModal");
+      const modalContent = document.getElementById("modalContent");
+      const scoreText = document.getElementById("scoreText");
+      const streakText = document.getElementById("streakText");
+      const timerText = document.getElementById("timerText");
+      const userAnswerText = document.getElementById("userAnswerText");
+      const feedbackText = document.getElementById("feedbackText");
+      const questionCard = document.getElementById("questionCard");
+      const progressBar = document.getElementById("progressBar");
+      const highScoreText = document.getElementById("highScoreText");
+      const soundToggleBtn = document.getElementById("soundToggleBtn");
+      const soundIcon = document.getElementById("soundIcon");
+      const modeIndicator = document.getElementById("modeIndicator");
+
+      // Init High Score Display
+      highScoreText.textContent = highScore;
+
+      // Toggle Sound Mute
+      soundToggleBtn.addEventListener("click", () => {
+        soundFX.muted = !soundFX.muted;
+        if (soundFX.muted) {
+          soundIcon.className = "fas fa-volume-mute text-rose-400";
+        } else {
+          soundIcon.className = "fas fa-volume-up text-yellow-400";
+          soundFX.playCorrect();
+        }
+      });
+
+      document.getElementById("homeBtn").addEventListener("click", () => {
+        if (!gameplayScreen.classList.contains("hidden")) {
+          if (confirm("Apakah kamu yakin ingin keluar ke menu utama?")) {
+            endGame();
+            closeModalAndGoHome();
+          }
+        }
+      });
+
+      // --- Game Logic Functions ---
+      function startGame(mode) {
+        currentMode = mode;
+        score = 0;
+        streak = 0;
+        maxStreak = 0;
+        totalQuestions = 0;
+        correctQuestions = 0;
+        userAnswer = "";
+
+        // Mode Configurations
+        if (mode === "easy") {
+          totalTime = 45;
+          modeIndicator.textContent = "Mode: Mudah (1 Digit)";
+        } else if (mode === "medium") {
+          totalTime = 60;
+          modeIndicator.textContent = "Mode: Sedang (2 Digit)";
+        } else if (mode === "hard") {
+          totalTime = 60;
+          modeIndicator.textContent = "Mode: Sulit (3 Digit)";
+        } else if (mode === "rush") {
+          totalTime = 20;
+          modeIndicator.textContent = "Mode: Speed Rush";
         }
 
-        function submitAnswer() {
-            if (userAnswer === '') return;
+        timeLeft = totalTime;
 
-            totalQuestions++;
-            const numericUserAnswer = parseInt(userAnswer, 10);
+        // Update UI
+        updateStatsUI();
+        startScreen.classList.add("hidden");
+        gameplayScreen.classList.remove("hidden");
 
-            if (numericUserAnswer === correctAnswer) {
-                // Correct Answer Logic
-                correctQuestions++;
-                streak++;
-                if (streak > maxStreak) maxStreak = streak;
+        generateQuestion();
+        startTimer();
+      }
 
-                // Points calculation based on difficulty and streak
-                let basePoints = currentMode === 'easy' ? 10 : (currentMode === 'medium' ? 20 : 30);
-                let streakBonus = Math.min(streak * 2, 20);
-                score += basePoints + streakBonus;
+      function generateQuestion() {
+        userAnswer = "";
+        userAnswerText.textContent = "";
 
-                if (currentMode === 'rush') {
-                    timeLeft = Math.min(timeLeft + 2, 30); // Add time bonus in rush
-                }
-
-                soundFX.playCorrect();
-                triggerConfetti();
-                showFeedback(`Benar! +${basePoints + streakBonus}`, 'text-emerald-400');
-            } else {
-                // Wrong Answer Logic
-                streak = 0;
-                soundFX.playWrong();
-                
-                // Shake effect on question card
-                questionCard.classList.remove('animate-shake');
-                void questionCard.offsetWidth;
-                questionCard.classList.add('animate-shake');
-
-                showFeedback(`Salah! Jawabannya: ${correctAnswer}`, 'text-rose-400');
-            }
-
-            updateStatsUI();
-            generateQuestion();
+        if (currentMode === "easy") {
+          num1 = Math.floor(Math.random() * 9) + 1;
+          num2 = Math.floor(Math.random() * 9) + 1;
+        } else if (currentMode === "medium") {
+          num1 = Math.floor(Math.random() * 90) + 10;
+          num2 = Math.floor(Math.random() * 90) + 10;
+        } else if (currentMode === "hard") {
+          num1 = Math.floor(Math.random() * 900) + 100;
+          num2 = Math.floor(Math.random() * 900) + 100;
+        } else if (currentMode === "rush") {
+          // Mix of digits in speed rush
+          const isTwoDigit = Math.random() > 0.4;
+          num1 = isTwoDigit
+            ? Math.floor(Math.random() * 40) + 10
+            : Math.floor(Math.random() * 9) + 1;
+          num2 = isTwoDigit
+            ? Math.floor(Math.random() * 40) + 10
+            : Math.floor(Math.random() * 9) + 1;
         }
 
-        function showFeedback(text, colorClass) {
-            feedbackText.textContent = text;
-            feedbackText.className = `h-6 text-sm font-bold opacity-100 transition-opacity duration-200 ${colorClass}`;
-            setTimeout(() => {
-                feedbackText.classList.remove('opacity-100');
-                feedbackText.classList.add('opacity-0');
-            }, 1200);
+        correctAnswer = num1 + num2;
+
+        document.getElementById("num1").textContent = num1;
+        document.getElementById("num2").textContent = num2;
+
+        // Trigger Pop animation on card
+        questionCard.classList.remove("animate-pop");
+        void questionCard.offsetWidth; // Force reflow
+        questionCard.classList.add("animate-pop");
+      }
+
+      function pressNumpad(val) {
+        if (userAnswer.length < 5) {
+          userAnswer += val;
+          userAnswerText.textContent = userAnswer;
+        }
+      }
+
+      function clearAnswer() {
+        userAnswer = userAnswer.slice(0, -1);
+        userAnswerText.textContent = userAnswer;
+      }
+
+      function submitAnswer() {
+        if (userAnswer === "") return;
+
+        totalQuestions++;
+        const numericUserAnswer = parseInt(userAnswer, 10);
+
+        if (numericUserAnswer === correctAnswer) {
+          // Correct Answer Logic
+          correctQuestions++;
+          streak++;
+          if (streak > maxStreak) maxStreak = streak;
+
+          // Points calculation based on difficulty and streak
+          let basePoints =
+            currentMode === "easy" ? 10 : currentMode === "medium" ? 20 : 30;
+          let streakBonus = Math.min(streak * 2, 20);
+          score += basePoints + streakBonus;
+
+          if (currentMode === "rush") {
+            timeLeft = Math.min(timeLeft + 2, 30); // Add time bonus in rush
+          }
+
+          soundFX.playCorrect();
+          triggerConfetti();
+          showFeedback(
+            `Benar! +${basePoints + streakBonus}`,
+            "text-emerald-400",
+          );
+        } else {
+          // Wrong Answer Logic
+          streak = 0;
+          soundFX.playWrong();
+
+          // Shake effect on question card
+          questionCard.classList.remove("animate-shake");
+          void questionCard.offsetWidth;
+          questionCard.classList.add("animate-shake");
+
+          showFeedback(`Salah! Jawabannya: ${correctAnswer}`, "text-rose-400");
         }
 
-        function updateStatsUI() {
-            scoreText.textContent = score;
-            streakText.textContent = `${streak}x`;
-            timerText.textContent = `${timeLeft}s`;
+        updateStatsUI();
+        generateQuestion();
+      }
 
-            // Progress bar ratio
-            const ratio = (timeLeft / totalTime) * 100;
-            progressBar.style.width = `${Math.max(0, ratio)}%`;
+      function showFeedback(text, colorClass) {
+        feedbackText.textContent = text;
+        feedbackText.className = `h-6 text-sm font-bold opacity-100 transition-opacity duration-200 ${colorClass}`;
+        setTimeout(() => {
+          feedbackText.classList.remove("opacity-100");
+          feedbackText.classList.add("opacity-0");
+        }, 1200);
+      }
 
-            // Color timer warning
-            if (timeLeft <= 10) {
-                timerText.className = 'font-display text-xl sm:text-3xl font-extrabold text-rose-500 animate-pulse';
-            } else {
-                timerText.className = 'font-display text-xl sm:text-3xl font-extrabold text-emerald-400';
-            }
+      function updateStatsUI() {
+        scoreText.textContent = score;
+        streakText.textContent = `${streak}x`;
+        timerText.textContent = `${timeLeft}s`;
+
+        // Progress bar ratio
+        const ratio = (timeLeft / totalTime) * 100;
+        progressBar.style.width = `${Math.max(0, ratio)}%`;
+
+        // Color timer warning
+        if (timeLeft <= 10) {
+          timerText.className =
+            "font-display text-xl sm:text-3xl font-extrabold text-rose-500 animate-pulse";
+        } else {
+          timerText.className =
+            "font-display text-xl sm:text-3xl font-extrabold text-emerald-400";
         }
+      }
 
-        function startTimer() {
+      function startTimer() {
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+          timeLeft--;
+          updateStatsUI();
+
+          if (timeLeft <= 0) {
             clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                updateStatsUI();
+            endGame();
+          }
+        }, 1000);
+      }
 
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    endGame();
-                }
-            }, 1000);
+      function endGame() {
+        clearInterval(timerInterval);
+        soundFX.playGameOver();
+
+        // Save High Score
+        if (score > highScore) {
+          highScore = score;
+          localStorage.setItem("math_quest_highscore", highScore);
+          highScoreText.textContent = highScore;
         }
 
-        function endGame() {
-            clearInterval(timerInterval);
-            soundFX.playGameOver();
+        // Populate Modal Stats
+        document.getElementById("finalScore").textContent = score;
+        document.getElementById("finalStreak").textContent = `${maxStreak}x`;
+        document.getElementById("finalCount").textContent =
+          `${correctQuestions}/${totalQuestions}`;
 
-            // Save High Score
-            if (score > highScore) {
-                highScore = score;
-                localStorage.setItem('math_quest_highscore', highScore);
-                highScoreText.textContent = highScore;
-            }
+        const accuracy =
+          totalQuestions > 0
+            ? Math.round((correctQuestions / totalQuestions) * 100)
+            : 0;
+        document.getElementById("finalAccuracy").textContent = `${accuracy}%`;
 
-            // Populate Modal Stats
-            document.getElementById('finalScore').textContent = score;
-            document.getElementById('finalStreak').textContent = `${maxStreak}x`;
-            document.getElementById('finalCount').textContent = `${correctQuestions}/${totalQuestions}`;
-            
-            const accuracy = totalQuestions > 0 ? Math.round((correctQuestions / totalQuestions) * 100) : 0;
-            document.getElementById('finalAccuracy').textContent = `${accuracy}%`;
+        // Show Modal
+        resultModal.classList.remove("hidden");
+        setTimeout(() => {
+          resultModal.classList.remove("opacity-0");
+          modalContent.classList.remove("scale-95");
+          modalContent.classList.add("scale-100");
+        }, 10);
+      }
 
-            // Show Modal
-            resultModal.classList.remove('hidden');
-            setTimeout(() => {
-                resultModal.classList.remove('opacity-0');
-                modalContent.classList.remove('scale-95');
-                modalContent.classList.add('scale-100');
-            }, 10);
+      function closeModalAndGoHome() {
+        resultModal.classList.add("opacity-0");
+        modalContent.classList.remove("scale-100");
+        modalContent.classList.add("scale-95");
+
+        setTimeout(() => {
+          resultModal.classList.add("hidden");
+          gameplayScreen.classList.add("hidden");
+          startScreen.classList.remove("hidden");
+        }, 200);
+      }
+
+      function restartGame() {
+        resultModal.classList.add("opacity-0");
+        modalContent.classList.remove("scale-100");
+        modalContent.classList.add("scale-95");
+
+        setTimeout(() => {
+          resultModal.classList.add("hidden");
+          startGame(currentMode);
+        }, 200);
+      }
+
+      // --- Keyboard Input Handling for Laptop / PC Users ---
+      document.addEventListener("keydown", (e) => {
+        if (gameplayScreen.classList.contains("hidden")) return;
+
+        if (e.key >= "0" && e.key <= "9") {
+          pressNumpad(e.key);
+        } else if (e.key === "Enter") {
+          submitAnswer();
+        } else if (e.key === "Backspace") {
+          clearAnswer();
         }
-
-        function closeModalAndGoHome() {
-            resultModal.classList.add('opacity-0');
-            modalContent.classList.remove('scale-100');
-            modalContent.classList.add('scale-95');
-
-            setTimeout(() => {
-                resultModal.classList.add('hidden');
-                gameplayScreen.classList.add('hidden');
-                startScreen.classList.remove('hidden');
-            }, 200);
-        }
-
-        function restartGame() {
-            resultModal.classList.add('opacity-0');
-            modalContent.classList.remove('scale-100');
-            modalContent.classList.add('scale-95');
-
-            setTimeout(() => {
-                resultModal.classList.add('hidden');
-                startGame(currentMode);
-            }, 200);
-        }
-
-        // --- Keyboard Input Handling for Laptop / PC Users ---
-        document.addEventListener('keydown', (e) => {
-            if (gameplayScreen.classList.contains('hidden')) return;
-
-            if (e.key >= '0' && e.key <= '9') {
-                pressNumpad(e.key);
-            } else if (e.key === 'Enter') {
-                submitAnswer();
-            } else if (e.key === 'Backspace') {
-                clearAnswer();
-            }
-        });
+      });
     </script>
-</body>
+  </body>
 </html>
